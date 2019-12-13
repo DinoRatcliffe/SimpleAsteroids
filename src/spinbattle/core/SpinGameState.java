@@ -24,6 +24,9 @@ public class SpinGameState implements AbstractGameState {
     // number of ticks made by this instance
     public int nTicks;
 
+    // stored current score that can be serialized
+    public double currentScore;
+
     // may set a limit on the game length
     // this will be used in the isTerminal() method
     public SpinBattleParams params;
@@ -46,6 +49,7 @@ public class SpinGameState implements AbstractGameState {
         // just shallow-copy the params
         copy.params = params;
         copy.nTicks = nTicks;
+        copy.currentScore = currentScore;
         // deep copy the planets
         copy.planets = new ArrayList<>();
         for (Planet p : planets) {
@@ -75,6 +79,7 @@ public class SpinGameState implements AbstractGameState {
         }
         nTicks++;
         totalTicks++;
+        currentScore = getScore();
         return this;
     }
 
@@ -189,6 +194,7 @@ public class SpinGameState implements AbstractGameState {
             // System.out.println("Set VF: " + vectorField);
         }
 
+        currentScore = getScore();
         return this;
     }
 
