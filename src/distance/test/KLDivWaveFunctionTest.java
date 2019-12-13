@@ -4,8 +4,8 @@ import distance.convolution.ConvNTuple;
 import distance.kl.KLDiv;
 import distance.pattern.PatternDistribution;
 import distance.view.LevelView;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
+//import javafx.scene.layout.Border;
+//import javafx.scene.layout.BorderLayout;
 import utilities.JEasyFrame;
 
 import javax.swing.*;
