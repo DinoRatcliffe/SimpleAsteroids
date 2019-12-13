@@ -19,9 +19,10 @@ dependencies {
 
   compile(files("lib/gvgai-master.jar"))
   compile("com.google.code.gson:gson:2.2.4")
+  compile("org.tensorflow:tensorflow:1.15.0")
   compile("jdom:jdom:1.0")
 }
 
 application {
-    mainClassName="spinbattle.network.SpinBattleServer"
+    mainClassName="spinbattle.players.EvaluateFlatANNPlayer"
 }
