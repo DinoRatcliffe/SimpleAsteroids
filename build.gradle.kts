@@ -24,5 +24,19 @@ dependencies {
 }
 
 application {
-    mainClassName="spinbattle.players.EvaluateFlatANNPlayer"
+    mainClassName="spinbattle.actuator.SourceTargetActuatorTest"
+}
+
+tasks.register<JavaExec>("serve") {
+    group = "Runner"
+    description = "Runs spinbattle server"
+    main = "spinbattle.network.SpinBattleServer"
+    classpath = sourceSets["main"].runtimeClasspath
+}
+
+tasks.register<JavaExec>("evalann") {
+    group = "Runner"
+    description = "Evaluates ann player"
+    main = "spinbattle.players.EvaluateFlatANNPlayer"
+    classpath = sourceSets["main"].runtimeClasspath
 }
