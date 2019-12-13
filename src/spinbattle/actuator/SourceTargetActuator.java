@@ -12,7 +12,7 @@ import spinbattle.core.Transporter;
 
 public class SourceTargetActuator implements Actuator {
 
-    Integer planetSelected;
+    public Integer planetSelected;
     int playerId;
 
     boolean doNothing = false;
