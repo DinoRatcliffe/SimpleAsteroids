@@ -8,8 +8,10 @@ import java.util.Scanner;
 
 import agents.dummy.DoNothingAgent;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import ggi.core.SimplePlayerInterface;
 import spinbattle.actuator.Actuator;
+import spinbattle.actuator.ActuatorAdapter;
 import spinbattle.actuator.SourceTargetActuator;
 import spinbattle.core.SpinGameState;
 import spinbattle.params.SpinBattleParams;
@@ -22,7 +24,11 @@ public class SpinBattleServer extends Thread {
 
     public SpinBattleServer(Socket socket) {
         this.socket = socket;
-        this.gson = new Gson();
+
+        GsonBuilder builder = new GsonBuilder();
+        builder.registerTypeAdapter(Actuator.class, new ActuatorAdapter());
+        gson = builder.create();
+
         start();
     }
 
@@ -108,6 +114,7 @@ public class SpinBattleServer extends Thread {
                                    sendGameState(out, currentGameState);
                                    break;
                     case "transition": //System.out.println("transition");
+                                       currentGameState = loadGameState(in);
                                        currentGameState = transition(currentGameState, loadAction(in), opponent);
                                        sendGameState(out, currentGameState);
                                        break;
@@ -126,6 +133,7 @@ public class SpinBattleServer extends Thread {
         System.out.println("Setting seed to: " + seed);
         SpinBattleParams.random = new Random(seed);
         SpinBattleParams params = new SpinBattleParams();
+        params.maxTicks = 500;
         params.nPlanets = 5;
         params.transitSpeed = 30;
         params.useVectorField = false;
