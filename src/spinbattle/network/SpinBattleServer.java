@@ -21,9 +21,11 @@ public class SpinBattleServer extends Thread {
 
     Socket socket;
     Gson gson;
+    int index;
 
-    public SpinBattleServer(Socket socket) {
+    public SpinBattleServer(Socket socket, int index) {
         this.socket = socket;
+        this.index = index;
 
         GsonBuilder builder = new GsonBuilder();
         builder.registerTypeAdapter(Actuator.class, new ActuatorAdapter());
@@ -92,31 +94,35 @@ public class SpinBattleServer extends Thread {
             
             boolean requestClose = false;
             while (!requestClose) {
+                System.out.println(this.index + " waiting for command");
                 String cmd = in.nextLine();
+                System.out.println(this.index + cmd);
                 switch (cmd) {
-                    case "set_params": System.out.println("set_params");
+                    case "set_params": System.out.println(this.index + "set_params");
                                        currentParams = loadParams(in);
                                        currentGameState = restartStaticGame();
                                        sendGameState(out, currentGameState);
                                        break;
-                    case "get_params": System.out.println("get_params");
+                    case "get_params": System.out.println(this.index + "get_params");
                                        sendParams(out, currentParams);
                                        break;
-                    case "set_state": System.out.println("set_state");
+                    case "set_state": System.out.println(this.index + "set_state");
                                       currentGameState = loadGameState(in);
                                       break;
-                    case "get_state": System.out.println("get_state");
+                    case "get_state": System.out.println(this.index + "get_state");
                                       sendGameState(out, currentGameState);
                                       break;
-                    case "reset":  System.out.println("reset");
+                    case "reset":  System.out.println(this.index + "reset");
                                    System.out.println(currentGameState.getScore());
                                    currentGameState = restartStaticGame();
                                    sendGameState(out, currentGameState);
                                    break;
-                    case "transition": //System.out.println("transition");
-                                       currentGameState = loadGameState(in);
+                    case "transition": currentGameState = loadGameState(in);
+                                       System.out.println(this.index + "loaded state");
                                        currentGameState = transition(currentGameState, loadAction(in), opponent);
+                                       System.out.println(this.index + "performed transition");
                                        sendGameState(out, currentGameState);
+                                       System.out.println(this.index + "sendState");
                                        break;
                     case "close": requestClose = true;
                                   break;
@@ -147,10 +153,11 @@ public class SpinBattleServer extends Thread {
 
     public static void main(String[] args) throws Exception {
         ServerSocket serverSocket = new ServerSocket(defaultPort);
+        int i = 0;
         while (true) {
             System.out.println("waiting for client");
             Socket socket = serverSocket.accept();
-            new SpinBattleServer(socket);
+            new SpinBattleServer(socket, i++);
         }
     }
 }
