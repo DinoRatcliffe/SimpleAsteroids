@@ -70,14 +70,13 @@ public class SpinBattleServer extends Thread {
     }
 
     public void run() {
-        System.out.println("Started a new Socket: " + socket);
+        SpinBattleParams currentParams = new SpinBattleParams();
+        SpinGameState currentGameState = restartStaticGame();
 
         try {
             Scanner in = new Scanner(socket.getInputStream());
             PrintStream out = new PrintStream(socket.getOutputStream());
 
-            SpinBattleParams currentParams = new SpinBattleParams();
-            SpinGameState currentGameState = restartStaticGame();
             Actuator[] currentActuators = currentGameState.actuators;
 
             /*
@@ -93,36 +92,27 @@ public class SpinBattleServer extends Thread {
             SimplePlayerInterface opponent = randomPlayer;
             
             boolean requestClose = false;
+            int action = 0;
             while (!requestClose) {
-                System.out.println(this.index + " waiting for command");
                 String cmd = in.nextLine();
-                System.out.println(this.index + cmd);
                 switch (cmd) {
-                    case "set_params": System.out.println(this.index + "set_params");
-                                       currentParams = loadParams(in);
+                    case "set_params": currentParams = loadParams(in);
                                        currentGameState = restartStaticGame();
                                        sendGameState(out, currentGameState);
                                        break;
-                    case "get_params": System.out.println(this.index + "get_params");
-                                       sendParams(out, currentParams);
+                    case "get_params": sendParams(out, currentParams);
                                        break;
-                    case "set_state": System.out.println(this.index + "set_state");
-                                      currentGameState = loadGameState(in);
+                    case "set_state": currentGameState = loadGameState(in);
                                       break;
-                    case "get_state": System.out.println(this.index + "get_state");
-                                      sendGameState(out, currentGameState);
+                    case "get_state": sendGameState(out, currentGameState);
                                       break;
-                    case "reset":  System.out.println(this.index + "reset");
-                                   System.out.println(currentGameState.getScore());
-                                   currentGameState = restartStaticGame();
+                    case "reset":  currentGameState = restartStaticGame();
                                    sendGameState(out, currentGameState);
                                    break;
                     case "transition": currentGameState = loadGameState(in);
-                                       System.out.println(this.index + "loaded state");
-                                       currentGameState = transition(currentGameState, loadAction(in), opponent);
-                                       System.out.println(this.index + "performed transition");
+                                       action = loadAction(in);
+                                       currentGameState = transition(currentGameState, action, opponent);
                                        sendGameState(out, currentGameState);
-                                       System.out.println(this.index + "sendState");
                                        break;
                     case "close": requestClose = true;
                                   break;
@@ -136,7 +126,6 @@ public class SpinBattleServer extends Thread {
     public static SpinGameState restartStaticGame() {
         // Game Setup
         long seed = -6330548296303013003L;
-        System.out.println("Setting seed to: " + seed);
         SpinBattleParams.random = new Random(seed);
         SpinBattleParams params = new SpinBattleParams();
         params.maxTicks = 500;

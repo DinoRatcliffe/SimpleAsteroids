@@ -29,10 +29,12 @@ public class Collider {
     public Planet getTargetInRange(SpinGameState gameState, Transporter t) {
         if (t.target != null) {
             Planet target = gameState.planets.get(t.target);
-            double dist = t.mo.s.dist(target.position);
-            // System.out.println(dist);
-            if (dist < target.getRadius()) {
-                return target;
+            if (t.mo != null) {
+                double dist = t.mo.s.dist(target.position);
+                // System.out.println(dist);
+                if (dist < target.getRadius()) {
+                    return target;
+                }
             }
         }
         return null;
