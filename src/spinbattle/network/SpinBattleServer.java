@@ -22,10 +22,19 @@ public class SpinBattleServer extends Thread {
     Socket socket;
     Gson gson;
     int index;
+    boolean evalServer;
+    long[] eval_seeds = {-6330548296303013003L,};
+//                         42L,
+//                         1010L,
+//                         -983324923894L,
+//                         92348927349823L};
+    int current_eval_seed;
 
     public SpinBattleServer(Socket socket, int index) {
         this.socket = socket;
         this.index = index;
+        this.evalServer = false;
+        this.current_eval_seed = 0;
 
         GsonBuilder builder = new GsonBuilder();
         builder.registerTypeAdapter(Actuator.class, new ActuatorAdapter());
@@ -104,6 +113,14 @@ public class SpinBattleServer extends Thread {
                                        break;
                     case "set_state": currentGameState = loadGameState(in);
                                       break;
+                    case "set_eval_games": this.evalServer = true;
+                                           currentGameState = restartStaticGame();
+                                           sendGameState(out, currentGameState);
+                                           break;
+                    case "set_random_games": this.evalServer = false;
+                                             currentGameState = restartStaticGame();
+                                             sendGameState(out, currentGameState);
+                                             break;
                     case "get_state": sendGameState(out, currentGameState);
                                       break;
                     case "reset":  currentGameState = restartStaticGame();
@@ -123,10 +140,15 @@ public class SpinBattleServer extends Thread {
         }
     }
 
-    public static SpinGameState restartStaticGame() {
+    public SpinGameState restartStaticGame() {
         // Game Setup
-        long seed = -6330548296303013003L;
-        SpinBattleParams.random = new Random(seed);
+        if (this.evalServer) {
+            SpinBattleParams.random = new Random(eval_seeds[current_eval_seed]);
+            current_eval_seed += 1;
+            current_eval_seed = current_eval_seed % eval_seeds.length;
+        } else {
+            SpinBattleParams.random = new Random(eval_seeds[0]);
+        }
         SpinBattleParams params = new SpinBattleParams();
         params.maxTicks = 500;
         params.nPlanets = 5;
