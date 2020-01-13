@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/SimpleAsteroids.iml" filepath="$PROJECT_DIR$/.idea/SimpleAsteroids.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/SimpleAsteroids.main.iml" filepath="$PROJECT_DIR$/.idea/modules/SimpleAsteroids.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/SimpleAsteroids.test.iml" filepath="$PROJECT_DIR$/.idea/modules/SimpleAsteroids.test.iml" />
     </modules>

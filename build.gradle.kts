@@ -4,7 +4,13 @@ plugins {
     application
 }
 
-sourceSets["main"].java.srcDir("src")
+sourceSets {
+    main {
+        java {
+            srcDir("src")
+        }
+    }
+}
 
 repositories {
   mavenCentral()
@@ -39,4 +45,10 @@ tasks.register<JavaExec>("evalann") {
     description = "Evaluates ann player"
     main = "spinbattle.players.EvaluateFlatANNPlayer"
     classpath = sourceSets["main"].runtimeClasspath
+}
+
+tasks.withType<Jar>() {
+    configurations["compileClasspath"].forEach {file: File ->
+        from(zipTree(file.absoluteFile))
+    }
 }
