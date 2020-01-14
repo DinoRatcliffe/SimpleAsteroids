@@ -1,6 +1,7 @@
 package spinbattle.players;
 
 import agents.dummy.DoNothingAgent;
+import agents.dummy.RandomAgent;
 import agents.evo.EvoAgent;
 import evodef.DefaultMutator;
 import evodef.EvoAlg;
@@ -18,13 +19,15 @@ import utilities.StatSummary;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.function.BiFunction;
 
 public class EvaluateFlatANNPlayer {
     public static void main(String[] args) throws Exception {
         // csv scores output
-        File csvOutput = new File("p0-ann-p1-rhea-scores.csv");
+        File csvOutput = new File("p0-ann-p1-rhea-scores-testing-iter.csv");
         BufferedWriter csvWriter = new BufferedWriter(new FileWriter(csvOutput));
         csvWriter.write("game, score\n");
 
@@ -35,8 +38,10 @@ public class EvaluateFlatANNPlayer {
         // Agent setup
         SimplePlayerInterface randomPlayer = new agents.dummy.RandomAgent();
         SimplePlayerInterface doNothingPlayer = new DoNothingAgent();
-        FlatANNPlayer annPlayer = new FlatANNPlayer("/home/dino/development/func-kit/spin-games/2019-12-10 11:11:09.293231/model/990/testing_model", 5, new Converter(45)); // Change to be argument passed in
+//        FlatANNPlayer annPlayer = new FlatANNPlayer("/home/dino/development/func-kit/spin-games/2019-12-10 11:11:09.293231/model/990/testing_model", 5, new Converter(45)); // Change to be argument passed in
+        IterANNPlayer annPlayer = new IterANNPlayer("/home/dino/development/func-kit/cma-spin-games-iter/2020-01-11 21:26:59.045337/model/100/testing_model", 5, new IterConverter());
         SimplePlayerInterface evoAgent = getEvoAgent();
+        SimplePlayerInterface randomAgent = new RandomAgent();
 
         int[] actions = new int[2];
         for (int i = 0; i<100; i++) {
@@ -145,3 +150,90 @@ class Converter implements BiFunction<AbstractGameState, Integer, double[]> {
         return observation;
     }
 };
+
+class IterConverter implements BiFunction<AbstractGameState, Integer, double[]> {
+    @Override
+    public double[] apply(AbstractGameState abstractGameState, Integer playerId) {
+        return stateToInput((SpinGameState) abstractGameState, playerId);
+    }
+
+    private double[] stateToInput(SpinGameState gameState, int playerId) {
+        double  playerShips = 0,
+                playerGrowth = 0,
+                opponentShips = 0,
+                opponentGrowth = 0,
+                neutralShips = 0;
+        HashMap<Integer, Double> transitCounts = new HashMap<Integer, Double>();
+
+        for (Planet planet : gameState.planets) {
+            if (planet.ownedBy == playerId) {
+                playerShips += planet.shipCount;
+                playerGrowth += planet.growthRate;
+            } else if (planet.ownedBy < 2) {
+                opponentShips += planet.shipCount;
+                opponentGrowth += planet.growthRate;
+            } else {
+                neutralShips += planet.shipCount;
+            }
+            Transporter transporter = planet.getTransporter();
+            if (transporter != null) {
+                double payload = transporter.payload;
+                if (transporter.ownedBy != playerId) {
+                    payload *= -1;
+                }
+                if (!transitCounts.containsKey(transporter.target)) {
+                    transitCounts.put(transporter.target, 0.0);
+                }
+                transitCounts.put(transporter.target, transitCounts.get(transporter.target) + payload);
+            }
+        }
+
+        double[] featureVector = new double[18 * (gameState.planets.size() * gameState.planets.size() - gameState.planets.size())];
+        int currentIdx = 0;
+
+        Planet src;
+        Planet dest;
+        for (int i = 0; i < gameState.planets.size(); i++) {
+            for (int j = 0; j < gameState.planets.size(); j++) {
+                if (i != j) {
+                    src = gameState.planets.get(i);
+                    dest = gameState.planets.get(j);
+
+                    //global features
+                    featureVector[currentIdx++] = playerShips;
+                    featureVector[currentIdx++] = playerGrowth;
+                    featureVector[currentIdx++] = opponentShips;
+                    featureVector[currentIdx++] = opponentGrowth;
+                    featureVector[currentIdx++] = neutralShips;
+
+                    // planet specific features
+                    featureVector[currentIdx++] = src.shipCount;
+                    featureVector[currentIdx++] = src.growthRate;
+                    featureVector[currentIdx++] = src.ownedBy == 0 ? 0.0 : 1.0;
+                    featureVector[currentIdx++] = src.ownedBy == 1 ? 0.0 : 1.0;
+                    featureVector[currentIdx++] = src.ownedBy == 2 ? 0.0 : 1.0;
+                    if (transitCounts.containsKey(src.index)) {
+                        featureVector[currentIdx++] = transitCounts.get(src.index);
+                    } else {
+                        featureVector[currentIdx++] = 0;
+                    }
+
+                    featureVector[currentIdx++] = dest.shipCount;
+                    featureVector[currentIdx++] = dest.growthRate;
+                    featureVector[currentIdx++] = dest.ownedBy == 0 ? 0.0 : 1.0;
+                    featureVector[currentIdx++] = dest.ownedBy == 1 ? 0.0 : 1.0;
+                    featureVector[currentIdx++] = dest.ownedBy == 2 ? 0.0 : 1.0;
+                    if (transitCounts.containsKey(dest.index)) {
+                        featureVector[currentIdx++] = transitCounts.get(dest.index);
+                    } else {
+                        featureVector[currentIdx++] = 0;
+                    }
+
+                    // planet pair features
+                    featureVector[currentIdx++] = src.position.dist(dest.position);
+                }
+            }
+        }
+        return featureVector;
+    }
+}
