@@ -26,8 +26,14 @@ import java.util.function.BiFunction;
 
 public class EvaluateFlatANNPlayer {
     public static void main(String[] args) throws Exception {
+        String netType = args[0];
+        String opponentType = args[1];
+        String checkpoint = args[2];
+        String outfile = args[3];
+        int nGames = Integer.parseInt(args[4]);
+
         // csv scores output
-        File csvOutput = new File("p0-ann-p1-rhea-scores-testing-iter.csv");
+        File csvOutput = new File(outfile);
         BufferedWriter csvWriter = new BufferedWriter(new FileWriter(csvOutput));
         csvWriter.write("game, score\n");
 
@@ -38,16 +44,28 @@ public class EvaluateFlatANNPlayer {
         // Agent setup
         SimplePlayerInterface randomPlayer = new agents.dummy.RandomAgent();
         SimplePlayerInterface doNothingPlayer = new DoNothingAgent();
-//        FlatANNPlayer annPlayer = new FlatANNPlayer("/home/dino/development/func-kit/spin-games/2019-12-10 11:11:09.293231/model/990/testing_model", 5, new Converter(45)); // Change to be argument passed in
-        IterANNPlayer annPlayer = new IterANNPlayer("/home/dino/development/func-kit/cma-spin-games-iter/2020-01-11 21:26:59.045337/model/100/testing_model", 5, new IterConverter());
-        SimplePlayerInterface evoAgent = getEvoAgent();
-        SimplePlayerInterface randomAgent = new RandomAgent();
+
+        SimplePlayerInterface annPlayer;
+        if (netType.equals("flat")) {
+            annPlayer = new FlatANNPlayer(checkpoint, 5, new Converter(45)); // Change to be argument passed in
+        } else {
+            annPlayer = new IterANNPlayer(checkpoint, 5, new IterConverter());
+        }
+
+        SimplePlayerInterface opponentAgent;
+        System.out.println(opponentType);
+        if (opponentType.equals("evo")) {
+            opponentAgent = getEvoAgent();
+            System.out.println("using evo agent");
+        } else {
+            opponentAgent = new RandomAgent();
+        }
 
         int[] actions = new int[2];
-        for (int i = 0; i<100; i++) {
+        for (int i = 0; i<nGames; i++) {
             while (!gameState.isTerminal()) {
                 actions[0] = annPlayer.getAction(gameState, 0);
-                actions[1] = evoAgent.getAction(gameState, 1);
+                actions[1] = opponentAgent.getAction(gameState, 1);
                 gameState = (SpinGameState) gameState.next(actions);
             }
             scoreSummary.add(gameState.getScore());
