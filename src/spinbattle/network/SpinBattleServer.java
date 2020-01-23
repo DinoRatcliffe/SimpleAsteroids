@@ -151,10 +151,11 @@ public class SpinBattleServer extends Thread {
         }
         SpinBattleParams params = new SpinBattleParams();
         params.maxTicks = 500;
-        params.nPlanets = 5;
+        params.nPlanets = 6;
         params.transitSpeed = 30;
         params.useVectorField = false;
         params.useProximityMap = false;
+        params.symmetricMaps = true;
         params.includeTransitShipsInScore = true;
         SpinGameState gameState = new SpinGameState().setParams(params).setPlanets();
         gameState.actuators[0] = new SourceTargetActuator().setPlayerId(0);

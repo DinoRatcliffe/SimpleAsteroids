@@ -47,6 +47,13 @@ tasks.register<JavaExec>("evalann") {
     classpath = sourceSets["main"].runtimeClasspath
 }
 
+tasks.register<JavaExec>("evalrheaann") {
+    group = "Runner"
+    description = "Evaluates RHEA integrated with ANN Policy"
+    main = "spinbattle.players.EvaluatePolicyRHEAANN"
+    classpath = sourceSets["main"].runtimeClasspath
+}
+
 tasks.withType<Jar>() {
     configurations["compileClasspath"].forEach {file: File ->
         from(zipTree(file.absoluteFile))

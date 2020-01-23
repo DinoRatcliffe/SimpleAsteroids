@@ -40,6 +40,8 @@ public class SourceTargetActuatorTest {
 //        params.nPlanets = 10;
 //        params.transitSpeed *= 1.0;
         params.nPlanets = 12;
+
+        params.symmetricMaps = true;
         // params.height = 700;
 
         // SpinBattleParams altParams = params.copy();

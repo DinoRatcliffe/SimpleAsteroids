@@ -22,7 +22,7 @@ public class Planet {
     public Planet copy() {
         Planet planet = new Planet();
         // shallow copy position on the assumption that it will not change
-        planet.position = position;
+        planet.position = position.copy();
         planet.rotation = rotation;
         planet.rotationRate = rotationRate;
         planet.growthRate = growthRate;

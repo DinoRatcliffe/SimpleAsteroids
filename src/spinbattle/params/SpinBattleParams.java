@@ -50,6 +50,8 @@ public class SpinBattleParams {
 
     public boolean useVectorField = true;
 
+    public boolean symmetricMaps = false;
+
     public double transportTax = 0.0;
     public double radSep = 1.5;
 
@@ -77,6 +79,7 @@ public class SpinBattleParams {
         p.transportTax = transportTax;
         p.radSep = radSep;
         p.includeTransitShipsInScore = includeTransitShipsInScore;
+        p.symmetricMaps = symmetricMaps;
         return p;
     }
 

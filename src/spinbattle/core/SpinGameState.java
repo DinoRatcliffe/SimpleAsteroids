@@ -7,7 +7,6 @@ import spinbattle.params.Constants;
 import spinbattle.params.SpinBattleParams;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class SpinGameState implements AbstractGameState {
 
@@ -157,6 +156,16 @@ public class SpinGameState implements AbstractGameState {
     static int maxTries = 200;
 
     public SpinGameState setPlanets() {
+        SpinGameState newState;
+        if (params.symmetricMaps) {
+            newState = setSymmetricPlanets();
+        } else {
+            newState = setRandomPlanets();
+        }
+        return newState;
+    }
+
+    public SpinGameState setRandomPlanets() {
         planets = new ArrayList<>();
         int i=0;
         int whichEven = params.getRandom().nextInt(2);
@@ -175,6 +184,7 @@ public class SpinGameState implements AbstractGameState {
             }
             // System.out.println();
         }
+
         // System.out.println("To allocate: " + nToAllocate + " : " + planets.size());
 
         // set the neutral ones
@@ -183,6 +193,64 @@ public class SpinGameState implements AbstractGameState {
             if (valid(planet)) {
                 planet.setIndex(planets.size());
                 planets.add(planet);
+            }
+        }
+        // System.out.println(planets);
+        if (params.useProximityMap) {
+            proximityMap = new ProximityMap().setPlanets(this);
+        }
+        if (params.useVectorField) {
+            vectorField = new VectorField().setParams(params).setField(this);
+            // System.out.println("Set VF: " + vectorField);
+        }
+
+        currentScore = getScore();
+        return this;
+    }
+
+    public SpinGameState setSymmetricPlanets() {
+        planets = new ArrayList<>();
+        int i=0;
+        int whichEven = params.getRandom().nextInt(2);
+        // int nToAllocate = params.nPlanets - params.nNeutral;
+        while (planets.size() < params.nToAllocate / 2) {
+            int owner = (planets.size() % 2 == whichEven ? Constants.playerOne : Constants.playerTwo);
+            Planet planet = makePlanet(owner);
+            // System.out.println("Made planet for: " + owner + " ... size: " + planets.size());
+            planet.growthRate = params.maxGrowth;
+            if (valid_half(planet)) {
+                planet.setIndex(planets.size());
+                planets.add(planet);
+                // System.out.println("Added planet for: " + owner);
+            } else {
+                // System.out.println("Failed to add planet for: " + owner);
+            }
+            // System.out.println();
+        }
+
+        int size = planets.size();
+        for (int j = 0; j < size; j++) {
+            Planet newPlanet = planets.get(j).copy();
+            newPlanet.setOwnership(newPlanet.ownedBy == Constants.playerOne ? Constants.playerTwo : Constants.playerOne);
+            newPlanet.position.set(params.width - newPlanet.position.x, newPlanet.position.y);
+            newPlanet.setIndex(planets.size());
+            planets.add(newPlanet);
+            System.out.println("mirror planet");
+        }
+        // System.out.println("To allocate: " + nToAllocate + " : " + planets.size());
+
+        // set the neutral ones
+        while (planets.size() < params.nPlanets && i++ < maxTries) {
+            Planet planet = makePlanet(Constants.neutralPlayer);
+            if (valid_half(planet)) {
+                planet.setIndex(planets.size());
+                planets.add(planet);
+
+                // do mirror planet
+                Planet newPlanet = planet.copy();
+                newPlanet.position.set(params.width - newPlanet.position.x, newPlanet.position.y);
+                newPlanet.setIndex(planets.size());
+                planets.add(newPlanet);
             }
         }
         // System.out.println(planets);
@@ -208,6 +276,28 @@ public class SpinGameState implements AbstractGameState {
 
     boolean valid(Planet p) {
         double minX = Math.min(p.position.x, params.width - p.position.x);
+        double minY = Math.min(p.position.y, params.height - p.position.y);
+        // test whether planet is too close to border
+        if (Math.min(minX, minY) < p.getRadius() * params.radSep) {
+            // System.out.println("Failed border sep:" + minX +  " : " + minY);
+            return false;
+        }
+
+        // now check proximity to each of the existing ones
+
+        for (Planet x : planets) {
+            double sep = x.position.dist(p.position);
+            if (sep < params.radSep * (x.getRadius() + p.getRadius())) {
+                // System.out.println("Failed planet proximity: " + (int) sep);
+                return false;
+            }
+        }
+        return true;
+
+    }
+
+    boolean valid_half(Planet p) {
+        double minX = Math.min(p.position.x, params.width/2 - p.position.x);
         double minY = Math.min(p.position.y, params.height - p.position.y);
         // test whether planet is too close to border
         if (Math.min(minX, minY) < p.getRadius() * params.radSep) {

@@ -26,6 +26,7 @@ import java.util.function.BiFunction;
 
 public class EvaluateFlatANNPlayer {
     public static void main(String[] args) throws Exception {
+        System.out.println("hello world");
         String netType = args[0];
         String opponentType = args[1];
         String checkpoint = args[2];
@@ -47,9 +48,9 @@ public class EvaluateFlatANNPlayer {
 
         SimplePlayerInterface annPlayer;
         if (netType.equals("flat")) {
-            annPlayer = new FlatANNPlayer(checkpoint, 5, new Converter(45)); // Change to be argument passed in
+            annPlayer = new FlatANNPlayer(checkpoint, 6, new Converter(45)); // Change to be argument passed in
         } else {
-            annPlayer = new IterANNPlayer(checkpoint, 5, new IterConverter());
+            annPlayer = new IterANNPlayer(checkpoint, 6, new IterConverter());
         }
 
         SimplePlayerInterface opponentAgent;
@@ -119,10 +120,11 @@ public class EvaluateFlatANNPlayer {
         SpinBattleParams.random = new Random(seed);
         SpinBattleParams params = new SpinBattleParams();
         params.maxTicks = 500;
-        params.nPlanets = 5;
+        params.nPlanets = 6;
         params.transitSpeed = 30;
         params.useVectorField = false;
         params.useProximityMap = false;
+        params.symmetricMaps = true;
         params.includeTransitShipsInScore = true;
         SpinGameState gameState = new SpinGameState().setParams(params).setPlanets();
         gameState.actuators[0] = new SourceTargetActuator().setPlayerId(0);
@@ -199,10 +201,10 @@ class IterConverter implements BiFunction<AbstractGameState, Integer, double[]> 
                 if (transporter.ownedBy != playerId) {
                     payload *= -1;
                 }
-                if (!transitCounts.containsKey(transporter.target)) {
-                    transitCounts.put(transporter.target, 0.0);
+                if (!transitCounts.containsKey(planet.index)) {
+                    transitCounts.put(planet.index, 0.0);
                 }
-                transitCounts.put(transporter.target, transitCounts.get(transporter.target) + payload);
+                transitCounts.put(planet.index, transitCounts.get(planet.index) + payload);
             }
         }
 
