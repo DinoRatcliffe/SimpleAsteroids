@@ -26,9 +26,6 @@ import java.util.function.BiFunction;
 
 public class EvaluateFlatANNPlayer {
     public static void main(String[] args) throws Exception {
-        SpinGameState testGameState = restartStaticGame();
-        double[] features = new IterConverter().apply(testGameState, 0);
-        System.out.println("hello world");
         String netType = args[0];
         String opponentType = args[1];
         String checkpoint = args[2];
@@ -242,9 +239,9 @@ class IterConverter implements BiFunction<AbstractGameState, Integer, double[]> 
 
                     featureVector[currentIdx++] = dest.shipCount;
                     featureVector[currentIdx++] = dest.growthRate;
-                    featureVector[currentIdx++] = dest.ownedBy == 0 ? 0.0 : 1.0;
-                    featureVector[currentIdx++] = dest.ownedBy == 1 ? 0.0 : 1.0;
-                    featureVector[currentIdx++] = dest.ownedBy == 2 ? 0.0 : 1.0;
+                    featureVector[currentIdx++] = dest.ownedBy == 0 ? 1.0 : 0.0;
+                    featureVector[currentIdx++] = dest.ownedBy == 1 ? 1.0 : 0.0;
+                    featureVector[currentIdx++] = dest.ownedBy == 2 ? 1.0 : 0.0;
                     if (transitCounts.containsKey(dest.index)) {
                         featureVector[currentIdx++] = transitCounts.get(dest.index);
                     } else {

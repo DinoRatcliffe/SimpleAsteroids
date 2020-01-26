@@ -68,7 +68,7 @@ public class IterANNPlayer implements SimplePlayerInterface {
         int step = numActions - 1;
         int action_1 = max_i / step;
         int action_2 = max_i % step;
-        if (step >= action_1) {
+        if (action_2 >= action_1) {
             action_2 += 1;
         }
         nextAction = action_2;
