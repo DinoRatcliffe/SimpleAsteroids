@@ -14,7 +14,7 @@ public class IterANNPlayer implements SimplePlayerInterface {
     private SavedModelBundle savedModel;
     private int numActions;
     private BiFunction<AbstractGameState, Integer, double[]> gameStateConverter;
-    private boolean insideAction = false;
+    public boolean insideAction = false;
     private int nextAction = 0;
 
     public IterANNPlayer(String checkpointDir, int numActions, BiFunction<AbstractGameState, Integer, double[]> gameStateConverter) {
@@ -49,7 +49,7 @@ public class IterANNPlayer implements SimplePlayerInterface {
         double randomFloat = new Random().nextFloat();
 
         int max_i = 0;
-        double max_value = 0;
+        double max_value = out_policy[0][0];
         for (int i = 0; i < out_policy[0].length; i++) {
             randomFloat -= out_policy[0][i];
             if (randomFloat <= 0) {
@@ -61,6 +61,7 @@ public class IterANNPlayer implements SimplePlayerInterface {
                 max_i = i;
                 max_value = out_policy[0][i];
             }
+
         }
 
         //convert max_i to two actions
@@ -78,6 +79,7 @@ public class IterANNPlayer implements SimplePlayerInterface {
 
     @Override
     public SimplePlayerInterface reset() {
+        this.insideAction = false;
         return this;
     }
 }

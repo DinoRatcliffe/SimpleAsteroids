@@ -7,6 +7,8 @@ import spinbattle.params.Constants;
 import spinbattle.params.SpinBattleParams;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
 public class SpinGameState implements AbstractGameState {
 
@@ -31,10 +33,12 @@ public class SpinGameState implements AbstractGameState {
     public SpinBattleParams params;
 
     public ArrayList<Planet> planets;
+    private ArrayList<Integer> planetIndicies;
     public ProximityMap proximityMap;
     public VectorField vectorField;
     public DefaultLogger logger;
     static int nPlayers = 2;
+    private ArrayList<Integer> playerIndicies;
     public Actuator[] actuators = new Actuator[nPlayers];
 
     public SpinGameState setLogger(DefaultLogger logger) {
@@ -51,6 +55,8 @@ public class SpinGameState implements AbstractGameState {
         copy.currentScore = currentScore;
         // deep copy the planets
         copy.planets = new ArrayList<>();
+        copy.planetIndicies = planetIndicies;
+        copy.playerIndicies = playerIndicies;
         for (Planet p : planets) {
             copy.planets.add(p.copy());
         }
@@ -69,12 +75,16 @@ public class SpinGameState implements AbstractGameState {
     @Override
     public AbstractGameState next(int[] actions) {
         // System.out.println(Arrays.toString(actions));
-        for (int i=0; i<nPlayers; i++) {
+
+        Collections.shuffle(playerIndicies);
+        for (int i : playerIndicies) {
             if (actuators[i] != null)
                 actuators[i].actuate(actions[i], this);
         }
-        for (Planet p : planets) {
-            p.update(this);
+
+        Collections.shuffle(planetIndicies);
+        for (int i : planetIndicies) {
+            planets.get(i).update(this);
         }
         nTicks++;
         totalTicks++;
@@ -162,6 +172,16 @@ public class SpinGameState implements AbstractGameState {
         } else {
             newState = setRandomPlanets();
         }
+        newState.planetIndicies = new ArrayList<Integer>();
+        for (int i = 0; i<planets.size(); i++) {
+            newState.planetIndicies.add(i);
+        }
+
+        newState.playerIndicies = new ArrayList<Integer>();
+        for (int i = 0; i<nPlayers; i++) {
+            newState.playerIndicies.add(i);
+        }
+
         return newState;
     }
 
@@ -235,7 +255,6 @@ public class SpinGameState implements AbstractGameState {
             newPlanet.position.set(params.width - newPlanet.position.x, newPlanet.position.y);
             newPlanet.setIndex(planets.size());
             planets.add(newPlanet);
-            System.out.println("mirror planet");
         }
         // System.out.println("To allocate: " + nToAllocate + " : " + planets.size());
 

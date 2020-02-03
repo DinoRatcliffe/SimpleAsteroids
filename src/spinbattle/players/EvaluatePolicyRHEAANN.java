@@ -44,24 +44,20 @@ public class EvaluatePolicyRHEAANN {
         SimplePlayerInterface player;
 
         if (netType.equals("flat")) {
-            annPlayer = new FlatANNPlayer(checkpoint, 5, new Converter(45)); // Change to be argument passed in
+            annPlayer = new FlatANNPlayer(checkpoint, 6, new Converter(45)); // Change to be argument passed in
         } else {
-            annPlayer = new IterANNPlayer(checkpoint, 5, new IterConverter());
+            annPlayer = new IterANNPlayer(checkpoint, 6, new IterConverter());
         }
 
         player = getPolicyEvoAgent(annPlayer);
 
         SimplePlayerInterface opponentAgent;
-        System.out.println(opponentType);
+
         if (opponentType.equals("evo")) {
-            opponentAgent = getEvoAgent();
-            System.out.println("using evo agent");
+            opponentAgent = getPolicyEvoAgent(new RandomAgent());
         } else {
             opponentAgent = new RandomAgent();
         }
-
-        player = getEvoAgent();
-        opponentAgent = getEvoAgent();
 
         int[] actions = new int[2];
         for (int i = 0; i<nGames; i++) {
@@ -114,6 +110,9 @@ public class EvaluatePolicyRHEAANN {
 
     static SimplePlayerInterface getPolicyEvoAgent(SimplePlayerInterface policy) {
         PolicyEvoAgent evoAgent = new PolicyEvoAgent();
+        evoAgent.setUseShiftBuffer(true);
+        evoAgent.setNEvals(20);
+        evoAgent.setSequenceLength(100);
         evoAgent.setPolicy(policy);
         return evoAgent;
     }
@@ -126,7 +125,7 @@ public class EvaluatePolicyRHEAANN {
         SpinBattleParams params = new SpinBattleParams();
         params.maxTicks = 500;
         params.symmetricMaps = true;
-        params.nPlanets = 5;
+        params.nPlanets = 6;
         params.transitSpeed = 30;
         params.useVectorField = false;
         params.useProximityMap = false;

@@ -42,9 +42,6 @@ public class EvaluateFlatANNPlayer {
         StatSummary scoreSummary = new StatSummary();
 
         // Agent setup
-        SimplePlayerInterface randomPlayer = new agents.dummy.RandomAgent();
-        SimplePlayerInterface doNothingPlayer = new DoNothingAgent();
-
         SimplePlayerInterface annPlayer;
         if (netType.equals("flat")) {
             annPlayer = new FlatANNPlayer(checkpoint, 6, new Converter(45)); // Change to be argument passed in
@@ -67,9 +64,12 @@ public class EvaluateFlatANNPlayer {
                 actions[0] = annPlayer.getAction(gameState, 0);
                 actions[1] = opponentAgent.getAction(gameState, 1);
                 gameState = (SpinGameState) gameState.next(actions);
+
             }
-            scoreSummary.add(gameState.getScore());
-            System.out.println(gameState.getScore());
+            annPlayer.reset();
+            opponentAgent.reset();
+            scoreSummary.add(gameState.currentScore);
+            System.out.println(gameState.currentScore);
             csvWriter.write(i + ", " + gameState.getScore() + "\n");
             gameState = restartStaticGame();
         }
@@ -77,6 +77,25 @@ public class EvaluateFlatANNPlayer {
         System.out.println(scoreSummary);
 
 
+    }
+
+    public static SpinGameState restartStaticGame() {
+        // Game Setup
+        long[] eval_seeds = {-6330548296303013003L,};
+        SpinBattleParams.random = new Random(eval_seeds[0]);
+
+        SpinBattleParams params = new SpinBattleParams();
+        params.maxTicks = 500;
+        params.nPlanets = 6;
+        params.transitSpeed = 30;
+        params.useVectorField = false;
+        params.useProximityMap = false;
+        params.symmetricMaps = true;
+        params.includeTransitShipsInScore = true;
+        SpinGameState gameState = new SpinGameState().setParams(params).setPlanets();
+        gameState.actuators[0] = new SourceTargetActuator().setPlayerId(0);
+        gameState.actuators[1] = new SourceTargetActuator().setPlayerId(1);
+        return gameState;
     }
 
     static boolean useSimpleEvoAgent = false;
@@ -110,25 +129,6 @@ public class EvaluateFlatANNPlayer {
         //evoAgent.setVisual();
 
         return evoAgent;
-    }
-
-    public static SpinGameState restartStaticGame() {
-        // Game Setup
-        long seed = -6330548296303013003L;
-        System.out.println("Setting seed to: " + seed);
-        SpinBattleParams.random = new Random(seed);
-        SpinBattleParams params = new SpinBattleParams();
-        params.maxTicks = 500;
-        params.nPlanets = 6;
-        params.transitSpeed = 30;
-        params.useVectorField = false;
-        params.useProximityMap = false;
-        params.symmetricMaps = true;
-        params.includeTransitShipsInScore = true;
-        SpinGameState gameState = new SpinGameState().setParams(params).setPlanets();
-        gameState.actuators[0] = new SourceTargetActuator().setPlayerId(0);
-        gameState.actuators[1] = new SourceTargetActuator().setPlayerId(1);
-        return gameState;
     }
 }
 
@@ -170,89 +170,3 @@ class Converter implements BiFunction<AbstractGameState, Integer, double[]> {
     }
 };
 
-class IterConverter implements BiFunction<AbstractGameState, Integer, double[]> {
-    @Override
-    public double[] apply(AbstractGameState abstractGameState, Integer playerId) {
-        return stateToInput((SpinGameState) abstractGameState, playerId);
-    }
-
-    private double[] stateToInput(SpinGameState gameState, int playerId) {
-        double  playerShips = 0,
-                playerGrowth = 0,
-                opponentShips = 0,
-                opponentGrowth = 0,
-                neutralShips = 0;
-        HashMap<Integer, Double> transitCounts = new HashMap<Integer, Double>();
-
-        for (Planet planet : gameState.planets) {
-            if (planet.ownedBy == playerId) {
-                playerShips += planet.shipCount;
-                playerGrowth += planet.growthRate;
-            } else if (planet.ownedBy < 2) {
-                opponentShips += planet.shipCount;
-                opponentGrowth += planet.growthRate;
-            } else {
-                neutralShips += planet.shipCount;
-            }
-            Transporter transporter = planet.getTransporter();
-            if (transporter != null) {
-                double payload = transporter.payload;
-                if (transporter.ownedBy != playerId) {
-                    payload *= -1;
-                }
-                if (!transitCounts.containsKey(planet.index)) {
-                    transitCounts.put(planet.index, 0.0);
-                }
-                transitCounts.put(planet.index, transitCounts.get(planet.index) + payload);
-            }
-        }
-
-        double[] featureVector = new double[18 * (gameState.planets.size() * gameState.planets.size() - gameState.planets.size())];
-        int currentIdx = 0;
-
-        Planet src;
-        Planet dest;
-        for (int i = 0; i < gameState.planets.size(); i++) {
-            for (int j = 0; j < gameState.planets.size(); j++) {
-                if (i != j) {
-                    src = gameState.planets.get(i);
-                    dest = gameState.planets.get(j);
-
-                    //global features
-                    featureVector[currentIdx++] = playerShips;
-                    featureVector[currentIdx++] = playerGrowth;
-                    featureVector[currentIdx++] = opponentShips;
-                    featureVector[currentIdx++] = opponentGrowth;
-                    featureVector[currentIdx++] = neutralShips;
-
-                    // planet specific features
-                    featureVector[currentIdx++] = src.shipCount;
-                    featureVector[currentIdx++] = src.growthRate;
-                    featureVector[currentIdx++] = src.ownedBy == 0 ? 1.0 : 0.0;
-                    featureVector[currentIdx++] = src.ownedBy == 1 ? 1.0 : 0.0;
-                    featureVector[currentIdx++] = src.ownedBy == 2 ? 1.0 : 0.0;
-                    if (transitCounts.containsKey(src.index)) {
-                        featureVector[currentIdx++] = transitCounts.get(src.index);
-                    } else {
-                        featureVector[currentIdx++] = 0;
-                    }
-
-                    featureVector[currentIdx++] = dest.shipCount;
-                    featureVector[currentIdx++] = dest.growthRate;
-                    featureVector[currentIdx++] = dest.ownedBy == 0 ? 1.0 : 0.0;
-                    featureVector[currentIdx++] = dest.ownedBy == 1 ? 1.0 : 0.0;
-                    featureVector[currentIdx++] = dest.ownedBy == 2 ? 1.0 : 0.0;
-                    if (transitCounts.containsKey(dest.index)) {
-                        featureVector[currentIdx++] = transitCounts.get(dest.index);
-                    } else {
-                        featureVector[currentIdx++] = 0;
-                    }
-
-                    // planet pair features
-                    featureVector[currentIdx++] = src.position.dist(dest.position);
-                }
-            }
-        }
-        return featureVector;
-    }
-}

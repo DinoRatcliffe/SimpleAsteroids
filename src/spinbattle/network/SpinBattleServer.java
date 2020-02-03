@@ -7,14 +7,21 @@ import java.util.Random;
 import java.util.Scanner;
 
 import agents.dummy.DoNothingAgent;
+import agents.evo.EvoAgent;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import evodef.DefaultMutator;
+import evodef.EvoAlg;
+import ga.SimpleRMHC;
+import ggi.agents.SimpleEvoAgent;
 import ggi.core.SimplePlayerInterface;
 import spinbattle.actuator.Actuator;
 import spinbattle.actuator.ActuatorAdapter;
 import spinbattle.actuator.SourceTargetActuator;
 import spinbattle.core.SpinGameState;
 import spinbattle.params.SpinBattleParams;
+import spinbattle.players.IterANNPlayer;
+import spinbattle.players.IterConverter;
 
 public class SpinBattleServer extends Thread {
     public static int defaultPort = 3000;
@@ -98,10 +105,12 @@ public class SpinBattleServer extends Thread {
 
             SimplePlayerInterface randomPlayer = new agents.dummy.RandomAgent();
             SimplePlayerInterface doNothingPlayer = new DoNothingAgent();
+            SimplePlayerInterface evoAgent = getEvoAgent();
             SimplePlayerInterface opponent = randomPlayer;
-            
-            boolean requestClose = false;
+
             int action = 0;
+            boolean requestClose = false;
+
             while (!requestClose) {
                 String cmd = in.nextLine();
                 switch (cmd) {
@@ -124,6 +133,7 @@ public class SpinBattleServer extends Thread {
                     case "get_state": sendGameState(out, currentGameState);
                                       break;
                     case "reset":  currentGameState = restartStaticGame();
+                                   opponent.reset();
                                    sendGameState(out, currentGameState);
                                    break;
                     case "transition": currentGameState = loadGameState(in);
@@ -146,9 +156,8 @@ public class SpinBattleServer extends Thread {
             SpinBattleParams.random = new Random(eval_seeds[current_eval_seed]);
             current_eval_seed += 1;
             current_eval_seed = current_eval_seed % eval_seeds.length;
-        } else {
-            SpinBattleParams.random = new Random(eval_seeds[0]);
         }
+
         SpinBattleParams params = new SpinBattleParams();
         params.maxTicks = 500;
         params.nPlanets = 6;
@@ -161,6 +170,39 @@ public class SpinBattleServer extends Thread {
         gameState.actuators[0] = new SourceTargetActuator().setPlayerId(0);
         gameState.actuators[1] = new SourceTargetActuator().setPlayerId(1);
         return gameState;
+    }
+
+    static boolean useSimpleEvoAgent = false;
+    static SimplePlayerInterface getEvoAgent() {
+
+        if (useSimpleEvoAgent) {
+            return new SimpleEvoAgent().setOpponent(new DoNothingAgent());
+        }
+        //
+        int nResamples = 1;
+
+        DefaultMutator mutator = new DefaultMutator(null);
+        // setting to true may give best performance
+        // mutator.totalRandomChaosMutation = true;
+        mutator.pointProb = 10;
+
+        SimpleRMHC simpleRMHC = new SimpleRMHC();
+        simpleRMHC.setSamplingRate(nResamples);
+        simpleRMHC.setMutator(mutator);
+
+        EvoAlg evoAlg = simpleRMHC;
+
+        // evoAlg = new SlidingMeanEDA();
+        // evoAlg = new SimpleGA();
+
+        int nEvals = 20;
+        int seqLength = 100;
+        EvoAgent evoAgent = new EvoAgent().setEvoAlg(evoAlg, nEvals).setSequenceLength(seqLength);
+        boolean useShiftBuffer = true;
+        evoAgent.setUseShiftBuffer(useShiftBuffer);
+        //evoAgent.setVisual();
+
+        return evoAgent;
     }
 
     public static void main(String[] args) throws Exception {
