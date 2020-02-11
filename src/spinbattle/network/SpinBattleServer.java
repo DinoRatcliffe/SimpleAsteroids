@@ -106,7 +106,7 @@ public class SpinBattleServer extends Thread {
             SimplePlayerInterface randomPlayer = new agents.dummy.RandomAgent();
             SimplePlayerInterface doNothingPlayer = new DoNothingAgent();
             SimplePlayerInterface evoAgent = getEvoAgent();
-            SimplePlayerInterface opponent = randomPlayer;
+            SimplePlayerInterface opponent = evoAgent;
 
             int action = 0;
             boolean requestClose = false;

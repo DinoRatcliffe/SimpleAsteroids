@@ -38,10 +38,10 @@ public class IterConverter implements BiFunction<AbstractGameState, Integer, dou
                 if (transporter.ownedBy != playerId) {
                     payload *= -1;
                 }
-                if (!transitCounts.containsKey(planet.index)) {
-                    transitCounts.put(planet.index, 0.0);
+                if (!transitCounts.containsKey(transporter.target)) {
+                    transitCounts.put(transporter.target, 0.0);
                 }
-                transitCounts.put(planet.index, transitCounts.get(planet.index) + payload);
+                transitCounts.put(transporter.target, transitCounts.get(transporter.target) + payload);
             }
         }
 

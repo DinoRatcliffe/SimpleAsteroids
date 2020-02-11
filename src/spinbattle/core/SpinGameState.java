@@ -229,6 +229,7 @@ public class SpinGameState implements AbstractGameState {
     }
 
     public SpinGameState setSymmetricPlanets() {
+        System.out.println("SYMMETRIC");
         planets = new ArrayList<>();
         int i=0;
         int whichEven = params.getRandom().nextInt(2);
@@ -252,7 +253,7 @@ public class SpinGameState implements AbstractGameState {
         for (int j = 0; j < size; j++) {
             Planet newPlanet = planets.get(j).copy();
             newPlanet.setOwnership(newPlanet.ownedBy == Constants.playerOne ? Constants.playerTwo : Constants.playerOne);
-            newPlanet.position.set(params.width - newPlanet.position.x, newPlanet.position.y);
+            newPlanet.position.set(params.width - newPlanet.position.x, params.height - newPlanet.position.y);
             newPlanet.setIndex(planets.size());
             planets.add(newPlanet);
         }

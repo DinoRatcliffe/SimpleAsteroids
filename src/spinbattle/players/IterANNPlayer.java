@@ -53,14 +53,14 @@ public class IterANNPlayer implements SimplePlayerInterface {
         for (int i = 0; i < out_policy[0].length; i++) {
             randomFloat -= out_policy[0][i];
             if (randomFloat <= 0) {
-                //action = i;
-                //break;
+                max_i = i;
+                break;
             }
 
-            if (out_policy[0][i] > max_value) {
-                max_i = i;
-                max_value = out_policy[0][i];
-            }
+ //           if (out_policy[0][i] > max_value) {
+ //               max_i = i;
+ //               max_value = out_policy[0][i];
+ //           }
 
         }
 

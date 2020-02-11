@@ -66,6 +66,8 @@ public class EvaluatePolicyRHEAANN {
                 actions[1] = opponentAgent.getAction(gameState, 1);
                 gameState = (SpinGameState) gameState.next(actions);
             }
+            player.reset();
+            opponentAgent.reset();
             scoreSummary.add(gameState.getScore());
             System.out.println(gameState.getScore());
             csvWriter.write(i + ", " + gameState.getScore() + "\n");
