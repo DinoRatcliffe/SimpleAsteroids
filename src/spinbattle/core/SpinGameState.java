@@ -33,12 +33,12 @@ public class SpinGameState implements AbstractGameState {
     public SpinBattleParams params;
 
     public ArrayList<Planet> planets;
-    private ArrayList<Integer> planetIndicies;
+    public ArrayList<Integer> planetIndicies;
     public ProximityMap proximityMap;
     public VectorField vectorField;
     public DefaultLogger logger;
     static int nPlayers = 2;
-    private ArrayList<Integer> playerIndicies;
+    public ArrayList<Integer> playerIndicies;
     public Actuator[] actuators = new Actuator[nPlayers];
 
     public SpinGameState setLogger(DefaultLogger logger) {
@@ -242,20 +242,17 @@ public class SpinGameState implements AbstractGameState {
             if (valid_half(planet)) {
                 planet.setIndex(planets.size());
                 planets.add(planet);
+
+                Planet newPlanet = planet.copy();
+                newPlanet.ownedBy = planet.ownedBy == Constants.playerOne ? Constants.playerTwo : Constants.playerOne;
+                newPlanet.position.set(params.width - newPlanet.position.x, params.height - newPlanet.position.y);
+                newPlanet.setIndex(planets.size());
+                planets.add(newPlanet);
                 // System.out.println("Added planet for: " + owner);
             } else {
                 // System.out.println("Failed to add planet for: " + owner);
             }
             // System.out.println();
-        }
-
-        int size = planets.size();
-        for (int j = 0; j < size; j++) {
-            Planet newPlanet = planets.get(j).copy();
-            newPlanet.setOwnership(newPlanet.ownedBy == Constants.playerOne ? Constants.playerTwo : Constants.playerOne);
-            newPlanet.position.set(params.width - newPlanet.position.x, params.height - newPlanet.position.y);
-            newPlanet.setIndex(planets.size());
-            planets.add(newPlanet);
         }
         // System.out.println("To allocate: " + nToAllocate + " : " + planets.size());
 
@@ -268,7 +265,7 @@ public class SpinGameState implements AbstractGameState {
 
                 // do mirror planet
                 Planet newPlanet = planet.copy();
-                newPlanet.position.set(params.width - newPlanet.position.x, newPlanet.position.y);
+                newPlanet.position.set(params.width - newPlanet.position.x, params.height - newPlanet.position.y);
                 newPlanet.setIndex(planets.size());
                 planets.add(newPlanet);
             }
