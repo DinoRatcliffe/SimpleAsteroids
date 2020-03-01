@@ -160,7 +160,7 @@ public class HyperParamTuneRunner {
         return match.mean();
     }
 
-    int[] solution;
+    public int[] solution;
 
     public double runTrial(EvoAlg evoAlg, AnnotatedFitnessSpace eval) {
 

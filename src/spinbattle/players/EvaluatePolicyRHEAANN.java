@@ -10,13 +10,12 @@ import ggi.agents.PolicyEvoAgent;
 import ggi.agents.SimpleEvoAgent;
 import ggi.core.SimplePlayerInterface;
 import spinbattle.actuator.SourceTargetActuator;
+import spinbattle.actuator.SourceTargetJointActuator;
 import spinbattle.core.SpinGameState;
 import spinbattle.params.SpinBattleParams;
 import utilities.StatSummary;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.*;
 import java.util.Random;
 
 public class EvaluatePolicyRHEAANN {
@@ -26,6 +25,24 @@ public class EvaluatePolicyRHEAANN {
         String checkpoint = args[2];
         String outfile = args[3];
         int nGames = Integer.parseInt(args[4]);
+        String paramsFile = args[5];
+
+        double probMutation = 0.2;
+        double initUsingPolicy = 0.8;
+        double appendUsingPolicy = 0.8;
+        double mutateUsingPolicy = 0.5;
+
+        if (!paramsFile.equals("default")) {
+            File csvParamsFile = new File(paramsFile);
+            BufferedReader csvReader = new BufferedReader(new FileReader(csvParamsFile));
+            String line = csvReader.readLine();
+            line = csvReader.readLine();
+            String[] values = line.split(",");
+            probMutation = Double.parseDouble(values[0]);
+            initUsingPolicy = Double.parseDouble(values[1]);
+            appendUsingPolicy = Double.parseDouble(values[2]);
+            mutateUsingPolicy = Double.parseDouble(values[3]);
+        }
 
         // csv scores output
         File csvOutput = new File(outfile);
@@ -41,15 +58,20 @@ public class EvaluatePolicyRHEAANN {
         SimplePlayerInterface doNothingPlayer = new DoNothingAgent();
 
         SimplePlayerInterface annPlayer;
-        SimplePlayerInterface player;
+        PolicyEvoAgent player;
 
         if (netType.equals("flat")) {
-            annPlayer = new FlatANNPlayer(checkpoint, 6, new Converter(45)); // Change to be argument passed in
+            annPlayer = new FlatANNPlayer(checkpoint, 6, new FlatConverter()); // Change to be argument passed in
         } else {
-            annPlayer = new IterANNPlayer(checkpoint, 6, new IterConverter());
+            annPlayer = new IterANNPlayer(checkpoint, 12, new IterConverter());
         }
 
-        player = getPolicyEvoAgent(annPlayer);
+        player = (PolicyEvoAgent) getPolicyEvoAgent(annPlayer);
+        player.setUseMutationTransducer(false);
+        player.setProbMutation(probMutation);
+        player.setInitUsingPolicy(initUsingPolicy);
+        player.setAppendUsingPolicy(appendUsingPolicy);
+        player.setMutateUsingPolicy(mutateUsingPolicy);
 
         SimplePlayerInterface opponentAgent;
 
@@ -59,18 +81,30 @@ public class EvaluatePolicyRHEAANN {
             opponentAgent = new RandomAgent();
         }
 
+        Random random = new Random();
+        int playerFirst;
+
         int[] actions = new int[2];
         for (int i = 0; i<nGames; i++) {
+            playerFirst = random.nextInt(2);
+            gameState.playerFirst = playerFirst;
             while (!gameState.isTerminal()) {
-                actions[0] = player.getAction(gameState, 0);
-                actions[1] = opponentAgent.getAction(gameState, 1);
+                if (playerFirst == 0) {
+                    actions[0] = player.getAction(gameState, 0);
+                    actions[1] = opponentAgent.getAction(gameState, 1);
+                } else {
+                    actions[1] = player.getAction(gameState, 1);
+                    actions[0] = opponentAgent.getAction(gameState, 0);
+                }
                 gameState = (SpinGameState) gameState.next(actions);
             }
             player.reset();
             opponentAgent.reset();
+
             scoreSummary.add(gameState.getScore());
             System.out.println(gameState.getScore());
             csvWriter.write(i + ", " + gameState.getScore() + "\n");
+
             gameState = restartStaticGame();
         }
         csvWriter.flush();
@@ -121,20 +155,25 @@ public class EvaluatePolicyRHEAANN {
 
     public static SpinGameState restartStaticGame() {
         // Game Setup
-        long seed = -6330548296303013003L;
-        System.out.println("Setting seed to: " + seed);
-        SpinBattleParams.random = new Random(seed);
+        //long seed = 42;
+        //System.out.println("Setting seed to: " + seed);
+        //SpinBattleParams.random = new Random(seed);
         SpinBattleParams params = new SpinBattleParams();
+        params.width = (int) (params.width*1.5);
+        params.height = (int) (params.height*1.5);
         params.maxTicks = 500;
-        params.symmetricMaps = true;
-        params.nPlanets = 6;
+        params.nPlanets = 12;
+        params.nToAllocate = 6;
         params.transitSpeed = 30;
         params.useVectorField = false;
         params.useProximityMap = false;
+//        params.minGrowth = 0.5;
+        params.maxGrowth = 0.25;
+        params.symmetricMaps = true;
         params.includeTransitShipsInScore = true;
         SpinGameState gameState = new SpinGameState().setParams(params).setPlanets();
-        gameState.actuators[0] = new SourceTargetActuator().setPlayerId(0);
-        gameState.actuators[1] = new SourceTargetActuator().setPlayerId(1);
+        gameState.actuators[0] = new SourceTargetJointActuator().setPlayerId(0);
+        gameState.actuators[1] = new SourceTargetJointActuator().setPlayerId(1);
         return gameState;
     }
 }

@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.function.BiFunction;
 
 public class IterConverter implements BiFunction<AbstractGameState, Integer, double[]> {
+    HashMap<Integer, Double> transitCounts = new HashMap<Integer, Double>();
+
     @Override
     public double[] apply(AbstractGameState abstractGameState, Integer playerId) {
         return stateToInput((SpinGameState) abstractGameState, playerId);
@@ -20,7 +22,7 @@ public class IterConverter implements BiFunction<AbstractGameState, Integer, dou
                 opponentShips = 0,
                 opponentGrowth = 0,
                 neutralShips = 0;
-        HashMap<Integer, Double> transitCounts = new HashMap<Integer, Double>();
+        transitCounts.clear();
 
         for (Planet planet : gameState.planets) {
             if (planet.ownedBy == playerId) {
@@ -45,11 +47,12 @@ public class IterConverter implements BiFunction<AbstractGameState, Integer, dou
             }
         }
 
-        double[] featureVector = new double[18 * (gameState.planets.size() * gameState.planets.size() - gameState.planets.size())];
+        double[] featureVector = new double[20 * (gameState.planets.size() * gameState.planets.size() - gameState.planets.size())];
         int currentIdx = 0;
 
         Planet src;
         Planet dest;
+
         for (int i = 0; i < gameState.planets.size(); i++) {
             for (int j = 0; j < gameState.planets.size(); j++) {
                 if (i != j) {
@@ -66,9 +69,10 @@ public class IterConverter implements BiFunction<AbstractGameState, Integer, dou
                     // planet specific features
                     featureVector[currentIdx++] = src.shipCount;
                     featureVector[currentIdx++] = src.growthRate;
-                    featureVector[currentIdx++] = src.ownedBy == 0 ? 1.0 : 0.0;
-                    featureVector[currentIdx++] = src.ownedBy == 1 ? 1.0 : 0.0;
+                    featureVector[currentIdx++] = src.ownedBy == playerId ? 1.0 : 0.0;
+                    featureVector[currentIdx++] = src.ownedBy != playerId && src.ownedBy != 2 ? 1.0 : 0.0;
                     featureVector[currentIdx++] = src.ownedBy == 2 ? 1.0 : 0.0;
+                    featureVector[currentIdx++] = src.getTransporter() != null && src.getTransporter().target != null ? 1.0 : 0.0;
                     if (transitCounts.containsKey(src.index)) {
                         featureVector[currentIdx++] = transitCounts.get(src.index);
                     } else {
@@ -77,9 +81,10 @@ public class IterConverter implements BiFunction<AbstractGameState, Integer, dou
 
                     featureVector[currentIdx++] = dest.shipCount;
                     featureVector[currentIdx++] = dest.growthRate;
-                    featureVector[currentIdx++] = dest.ownedBy == 0 ? 1.0 : 0.0;
-                    featureVector[currentIdx++] = dest.ownedBy == 1 ? 1.0 : 0.0;
+                    featureVector[currentIdx++] = dest.ownedBy == playerId ? 1.0 : 0.0;
+                    featureVector[currentIdx++] = dest.ownedBy != playerId && src.ownedBy != 2 ? 1.0 : 0.0;
                     featureVector[currentIdx++] = dest.ownedBy == 2 ? 1.0 : 0.0;
+                    featureVector[currentIdx++] = dest.getTransporter() != null && dest.getTransporter().target != null ? 1.0 : 0.0;
                     if (transitCounts.containsKey(dest.index)) {
                         featureVector[currentIdx++] = transitCounts.get(dest.index);
                     } else {

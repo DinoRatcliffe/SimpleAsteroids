@@ -1,6 +1,7 @@
 package spinbattle.actuator;
 
 import agents.dummy.DoNothingAgent;
+import agents.dummy.RandomAgent;
 import agents.evo.EvoAgent;
 import evodef.DefaultMutator;
 import evodef.EvoAlg;
@@ -13,9 +14,12 @@ import spinbattle.core.FalseModelAdapter;
 import spinbattle.core.SpinGameState;
 import spinbattle.params.Constants;
 import spinbattle.params.SpinBattleParams;
+import spinbattle.players.IterANNPlayer;
+import spinbattle.players.IterConverter;
 import spinbattle.players.TunablePriorityLauncher;
 import spinbattle.view.SpinBattleView;
 import utilities.JEasyFrame;
+import utilities.StatSummary;
 
 import java.awt.*;
 import java.util.Random;
@@ -51,6 +55,7 @@ public class SourceTargetActuatorTest {
         // params.maxInitialShips *= 3;
 
         SpinGameState gameState = new SpinGameState().setParams(params).setPlanets();
+        gameState = restartStaticGame();
 
         // BasicLogger basicLogger = new BasicLogger();
         DefaultLogger logger = new DefaultLogger();
@@ -60,23 +65,23 @@ public class SourceTargetActuatorTest {
 
         // System.out.println("Logger in copied state: " + copy1.logger);
 
-        // set up the actuator
-        gameState.actuators[0] = new SourceTargetActuator().setPlayerId(0);
-
-        // gameState.actuators[1] = new HeuristicActuator().setPlayerId(1);
-
-        gameState.actuators[1] = new SourceTargetActuator().setPlayerId(1);
-
-        SimplePlayerInterface evoAgent = getEvoAgent();
-
-        // SimplePlayerInterface player2 = getEvoAgent();
+        SimplePlayerInterface evoAgent = getPolicyEvoAgent(new RandomAgent());
+        SimplePlayerInterface player2 = new RandomAgent();
+        String checkpoint = "/mnt/storage-ssd/cma-planetwars/ntbea-experiments/single-player-joint-actuator-slow/0/models/1/saved_model";
+        SimplePlayerInterface annPlayer = new IterANNPlayer(checkpoint, 6, new IterConverter());
+        PolicyEvoAgent annPlayerEvo = getPolicyEvoAgent(annPlayer);
+        annPlayerEvo.setUseMutationTransducer(false);
+        annPlayerEvo.setMutateUsingPolicy(1.0);
+        annPlayerEvo.setAppendUsingPolicy(1.0);
+        annPlayerEvo.setInitUsingPolicy(1.0);
+        annPlayerEvo.setProbMutation(0.2);
 
         SimplePlayerInterface randomPlayer = new agents.dummy.RandomAgent();
         // evoAgent = randomPlayer;
 
         // but now we also need to establish a player
 
-        SpinBattleView view = new SpinBattleView().setParams(params).setGameState(gameState);
+        SpinBattleView view = new SpinBattleView().setParams(gameState.params).setGameState(gameState);
         // HeuristicLauncher launcher = new HeuristicLauncher();
         TunablePriorityLauncher launcher = new TunablePriorityLauncher();
         String title = "Spin Battle Game" ;
@@ -89,38 +94,51 @@ public class SourceTargetActuatorTest {
         waitUntilReady(view);
         int[] actions = new int[2];
 
-        int frameDelay = 40;
+        int frameDelay = 20;
 
-        SpinBattleParams falseParams = params.copy(); // new SpinBattleParams();
+        //SpinBattleParams falseParams = params.copy(); // new SpinBattleParams();
         // params.gravitationalFieldConstant *= 0;
         // falseParams.transitSpeed = 0.00000;
         // falseParams.clampZeroScore = false;
-        FalseModelAdapter falsePlayer = new FalseModelAdapter().setPlayer(evoAgent).setParams(falseParams);
+        //FalseModelAdapter falsePlayer = new FalseModelAdapter().setPlayer(evoAgent).setParams(falseParams);
 
         // may want to stop before the end of the game for demo purposes
-        int nTicks = 5000;
-        for (int i=0; i<nTicks && !gameState.isTerminal(); i++) {
-            // SpinGameState copy = ((SpinGameState) gameState.copy()).setParams(altParams);
-            actions[0] = evoAgent.getAction(gameState.copy(), 0);
-            // actions[0] = falsePlayer.getAction(gameState.copy(), 0);
-            // actions[1] = player2.getAction(gameState.copy(), 1);
-            // actions[0] = randomPlayer.getAction(gameState.copy(), 0);
-            // actions[1] = randomPlayer.getAction(gameState.copy(), 1);
-            // System.out.println(i + "\t " + actions[0]);
-            gameState.next(actions);
-            // mouseSlingController.update();
-            // launcher.makeTransits(gameState, Constants.playerOne);
-            if (i % launchPeriod == 0)
-                launcher.makeTransits(gameState, Constants.playerTwo);
-            SpinGameState viewCopy = (SpinGameState) gameState.copy();
-            viewCopy.logger = gameState.logger;
-            view.setGameState(viewCopy);
-            view.repaint();
-            frame.setTitle(title + " : " + i); //  + " : " + CaveView.getTitle());
-            System.out.println(gameState.actuators[0]);
-            Thread.sleep(frameDelay);
+        StatSummary winRate = new StatSummary();
+        int nTicks = 500;
+        int playerFirst;
+        Random random = new Random();
+        for (int j = 0; j<1000; j++) {
+            evoAgent.reset();
+            annPlayer.reset();
+            gameState = restartStaticGame();
+            playerFirst = random.nextInt(2);
+            gameState.playerFirst = playerFirst;
+            for (int i = 0; i < nTicks && !gameState.isTerminal(); i++) {
+                // SpinGameState copy = ((SpinGameState) gameState.copy()).setParams(altParams);
+                if (gameState.playerFirst == 0) {
+                    actions[0] = annPlayer.getAction(gameState.copy(), 0);
+                    actions[1] = evoAgent.getAction(gameState.copy(), 1);
+                } else {
+                    actions[1] = annPlayer.getAction(gameState.copy(), 1);
+                    actions[0] = evoAgent.getAction(gameState.copy(), 0);
+                }
+                gameState.next(actions);
+                // mouseSlingController.update();
+                // launcher.makeTransits(gameState, Constants.playerOne);
+//            if (i % launchPeriod == 0)
+//                launcher.makeTransits(gameState, Constants.playerTwo);
+//                SpinGameState viewCopy = (SpinGameState) gameState.copy();
+//                viewCopy.logger = gameState.logger;
+//                view.setGameState(viewCopy);
+//                view.repaint();
+//                frame.setTitle(title + " : " + i); //  + " : " + CaveView.getTitle());
+//                Thread.sleep(frameDelay);
+            }
+            System.out.println("made terminal: " + gameState.nTicks);
+            System.out.println("score: " + gameState.getScore());
+            winRate.add(gameState.getScore() > 0 ? 1 : 0);
         }
-        System.out.println(gameState.isTerminal());
+        System.out.println(winRate);
         String trajTitle = String.format("g = %.3f, spd = %.3f", params.gravitationalFieldConstant, params.transitSpeed);
         // logger.showTrajectories(params.width, params.height, trajTitle);
         // System.out.println("nTraj: " + logger.getTrajectoryLogger().trajectories.size());
@@ -139,10 +157,6 @@ public class SourceTargetActuatorTest {
 
     static SimplePlayerInterface getEvoAgent() {
 
-        if (usePolicyEvoAgent) {
-            return new PolicyEvoAgent();
-        }
-
         if (useSimpleEvoAgent) {
             return new SimpleEvoAgent().setOpponent(new DoNothingAgent());
         }
@@ -152,13 +166,14 @@ public class SourceTargetActuatorTest {
         DefaultMutator mutator = new DefaultMutator(null);
         // setting to true may give best performance
         // mutator.totalRandomChaosMutation = true;
-        mutator.pointProb = 30;
+        mutator.pointProb = 10;
 
         SimpleRMHC simpleRMHC = new SimpleRMHC();
         simpleRMHC.setSamplingRate(nResamples);
         simpleRMHC.setMutator(mutator);
 
         EvoAlg evoAlg = simpleRMHC;
+
         // evoAlg = new SlidingMeanEDA();
         // evoAlg = new SimpleGA();
 
@@ -167,7 +182,39 @@ public class SourceTargetActuatorTest {
         EvoAgent evoAgent = new EvoAgent().setEvoAlg(evoAlg, nEvals).setSequenceLength(seqLength);
         boolean useShiftBuffer = true;
         evoAgent.setUseShiftBuffer(useShiftBuffer);
-        evoAgent.setVisual();
+        //evoAgent.setVisual();
+
         return evoAgent;
+    }
+
+    static PolicyEvoAgent getPolicyEvoAgent(SimplePlayerInterface policy) {
+        PolicyEvoAgent evoAgent = new PolicyEvoAgent();
+        evoAgent.setUseShiftBuffer(true);
+        evoAgent.setNEvals(20);
+        evoAgent.setSequenceLength(100);
+        evoAgent.setPolicy(policy);
+        return evoAgent;
+    }
+
+    public static SpinGameState restartStaticGame() {
+        // Game Setup
+        SpinBattleParams.random = new Random(31415);
+        SpinBattleParams params = new SpinBattleParams();
+        params.width = (int) (params.width*1.5);
+        params.height = (int) (params.height*1.5);
+        params.maxTicks = 500;
+        params.nPlanets = 6;
+        params.nToAllocate = 6;
+        params.transitSpeed = 30;
+        params.useVectorField = false;
+        params.useProximityMap = false;
+//        params.minGrowth = 0.5;
+        params.maxGrowth = 0.25;
+        params.symmetricMaps = true;
+        params.includeTransitShipsInScore = true;
+        SpinGameState gameState = new SpinGameState().setParams(params).setPlanets();
+        gameState.actuators[0] = new SourceTargetJointActuator().setPlayerId(0);
+        gameState.actuators[1] = new SourceTargetJointActuator().setPlayerId(1);
+        return gameState;
     }
 }

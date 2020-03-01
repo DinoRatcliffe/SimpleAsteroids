@@ -3,6 +3,7 @@ package ggi.agents
 import agents.dummy.DoNothingAgent
 import ggi.core.AbstractGameState
 import ggi.core.SimplePlayerInterface
+import spinbattle.core.SpinGameState
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -35,6 +36,8 @@ data class PolicyEvoAgent(
     // SimplePlayerInterface opponentModel = new RandomAgent();
     override fun reset(): SimplePlayerInterface {
         buffer = null
+        val p = policy;
+        p?.reset()
         return this
     }
 
@@ -64,15 +67,17 @@ data class PolicyEvoAgent(
         solutions.clear()
         solutions.add(solution)
         scores.clear()
+
+        var curScore = evalSeq(gameState.copy(), solution, playerId, DoubleArray(solution.size));
         for (i in 0 until nEvals) {
             // evaluate the current one
             val scoreArrray1 = DoubleArray(solution.size)
             val scoreArrray2 = DoubleArray(solution.size)
             val mut = mutate(solution, probMutation, gameState, playerId)
-            val curScore = evalSeq(gameState.copy(), solution, playerId, scoreArrray1)
             val mutScore = evalSeq(gameState.copy(), mut, playerId, scoreArrray2)
             if (mutScore >= curScore) {
                 solution = mut
+                curScore = mutScore
             }
             solutions.add(mut)
             scores.add(scoreArrray1)
@@ -161,7 +166,7 @@ data class PolicyEvoAgent(
         val gs = gameState.copy()
         for (i in p.indices) {
             // fix the playerId for now
-            p[i] = vp.getAction(gs, 0)
+            p[i] = vp.getAction(gs, playerId)
             advance(gs, p[i], playerId)
             // gs.next(intArrayOf(p[i]))
         }
@@ -179,10 +184,11 @@ data class PolicyEvoAgent(
             // the action has already been taken, so we're processing the new p[i]
         }
         val vp = policy
-        if (vp == null || random.nextDouble() >= appendUsingPolicy)
+        if (vp == null || random.nextDouble() >= appendUsingPolicy) {
             p[p.size - 1] = random.nextInt(gs.nActions())
-        else
-            p[p.size - 1] = vp.getAction(gs, 0)
+        } else {
+            p[p.size - 1] = vp.getAction(gs, playerId)
+        }
         return p
     }
 
@@ -210,7 +216,7 @@ data class PolicyEvoAgent(
             delta += tickDelta * discount
             discount *= discountFactor
         }
-        return if (playerId == 0)
+        return if (playerId == (gameState as SpinGameState).playerFirst)
             delta
         else
             -delta

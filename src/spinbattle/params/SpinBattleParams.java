@@ -91,7 +91,7 @@ public class SpinBattleParams {
     public double gravitationalFieldConstant = 1.2;
     public double gravitationalForceConstant = 0.001;
 
-    public static Random random = new Random();
+    public transient static Random random = new Random();
 
     static Collider collider = new Collider();
 

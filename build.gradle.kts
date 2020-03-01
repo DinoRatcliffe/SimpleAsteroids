@@ -24,7 +24,7 @@ dependencies {
   implementation(kotlin("reflect"))
 
   compile(files("lib/gvgai-master.jar"))
-  compile("com.google.code.gson:gson:2.2.4")
+  compile("com.google.code.gson:gson:2.8.6")
   compile("org.tensorflow:tensorflow:1.15.0")
   compile("jdom:jdom:1.0")
 }

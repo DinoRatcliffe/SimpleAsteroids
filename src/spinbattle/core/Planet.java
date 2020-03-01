@@ -16,7 +16,7 @@ public class Planet {
 
     public double shipCount;
     public int ownedBy;
-    SpinBattleParams params;
+    transient SpinBattleParams params;
     Transporter transit;
 
     public Planet copy() {

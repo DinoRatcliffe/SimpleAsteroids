@@ -21,7 +21,7 @@ public class Transporter {
     public int parent;
     // use Integer to allow it to be null
     public Integer target;
-    SpinBattleParams params;
+    transient SpinBattleParams params;
     public int ownedBy;
     public double payload = 0;
 

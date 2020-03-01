@@ -12,6 +12,8 @@ import java.util.Random;
 
 public class SpinGameState implements AbstractGameState {
 
+    public int playerFirst = 0;
+
     // this tracks all calls to the next method
     // useful for calculating overall stats
 
@@ -99,7 +101,7 @@ public class SpinGameState implements AbstractGameState {
 
         // for now just do something very simple ...
         // but MUST be changed in future
-        return planets.size();
+        return planets.size() * planets.size() - planets.size();
     }
 
     @Override
@@ -119,7 +121,7 @@ public class SpinGameState implements AbstractGameState {
             // System.out.println("Awarding bonus: " + bonus);
             score += (singleOwner == Constants.playerOne) ? bonus : -bonus;
         }
-        return score;
+        return playerFirst == 0 ? score : -score;
     }
 
     public double getPlayerShips(int playerId) {
@@ -229,13 +231,12 @@ public class SpinGameState implements AbstractGameState {
     }
 
     public SpinGameState setSymmetricPlanets() {
-        System.out.println("SYMMETRIC");
         planets = new ArrayList<>();
         int i=0;
         int whichEven = params.getRandom().nextInt(2);
         // int nToAllocate = params.nPlanets - params.nNeutral;
         while (planets.size() < params.nToAllocate / 2) {
-            int owner = (planets.size() % 2 == whichEven ? Constants.playerOne : Constants.playerTwo);
+            int owner = (i % 2 == whichEven ? Constants.playerOne : Constants.playerTwo);
             Planet planet = makePlanet(owner);
             // System.out.println("Made planet for: " + owner + " ... size: " + planets.size());
             planet.growthRate = params.maxGrowth;
@@ -248,6 +249,7 @@ public class SpinGameState implements AbstractGameState {
                 newPlanet.position.set(params.width - newPlanet.position.x, params.height - newPlanet.position.y);
                 newPlanet.setIndex(planets.size());
                 planets.add(newPlanet);
+                i++;
                 // System.out.println("Added planet for: " + owner);
             } else {
                 // System.out.println("Failed to add planet for: " + owner);

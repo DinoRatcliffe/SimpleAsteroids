@@ -11,8 +11,8 @@ public class VectorField {
     public int cellSize = 10;
     public int w;
     public int h;
-    SpinBattleParams params;
-    SpinGameState gameState;
+    transient SpinBattleParams params;
+    transient SpinGameState gameState;
 
     public VectorField setParams(SpinBattleParams params) {
         this.params = params;

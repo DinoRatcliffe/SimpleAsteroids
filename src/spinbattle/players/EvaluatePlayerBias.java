@@ -10,6 +10,7 @@ import ggi.agents.PolicyEvoAgent;
 import ggi.agents.SimpleEvoAgent;
 import ggi.core.SimplePlayerInterface;
 import spinbattle.actuator.SourceTargetActuator;
+import spinbattle.actuator.SourceTargetJointActuator;
 import spinbattle.core.SpinGameState;
 import spinbattle.params.SpinBattleParams;
 import utilities.StatSummary;
@@ -34,28 +35,34 @@ public class EvaluatePlayerBias {
         StatSummary scoreSummary = new StatSummary();
 
         // Agent setup
-        SimplePlayerInterface player = getEvoAgent();
-        SimplePlayerInterface opponentAgent = getEvoAgent();
+        SimplePlayerInterface player = getPolicyEvoAgent(new RandomAgent());
+        SimplePlayerInterface opponentAgent = getPolicyEvoAgent(new RandomAgent());
+
+        Random random = new Random();
+        int playerFirst = random.nextInt(2);
 
         int[] actions = new int[2];
         for (int i = 0; i<nGames; i++) {
             int step = 0;
+            playerFirst = random.nextInt(2);
+            gameState.playerFirst = playerFirst;
             while (!gameState.isTerminal()) {
-                actions[0] = player.getAction(gameState, 0);
-                actions[1] = opponentAgent.getAction(gameState, 1);
-                gameState = (SpinGameState) gameState.next(actions);
-                if (step < 2) {
-                    System.out.println(step);
-                    System.out.println(gameState.playerIndicies);
-                    System.out.println(gameState.planetIndicies);
-                    step++;
+                if (playerFirst == 0) {
+                    actions[0] = player.getAction(gameState, 0);
+                    actions[1] = opponentAgent.getAction(gameState, 1);
+                } else {
+                    actions[1] = player.getAction(gameState, 1);
+                    actions[0] = opponentAgent.getAction(gameState, 0);
                 }
+                gameState = (SpinGameState) gameState.next(actions);
             }
             player.reset();
             opponentAgent.reset();
+
             scoreSummary.add(gameState.getScore());
             System.out.println(gameState.getScore());
             csvWriter.write(i + ", " + gameState.getScore() + "\n");
+
             gameState = restartStaticGame();
         }
         csvWriter.flush();
@@ -106,20 +113,23 @@ public class EvaluatePlayerBias {
 
     public static SpinGameState restartStaticGame() {
         // Game Setup
-        long seed = -6330548296303013003L;
-        System.out.println("Setting seed to: " + seed);
-        SpinBattleParams.random = new Random(seed);
+        //SpinBattleParams.random = new Random(42);
         SpinBattleParams params = new SpinBattleParams();
+        params.width = (int) (params.width*1.5);
+        params.height = (int) (params.height*1.5);
         params.maxTicks = 500;
-        params.symmetricMaps = true;
-        params.nPlanets = 6;
+        params.nPlanets = 12;
+        params.nToAllocate = 6;
         params.transitSpeed = 30;
         params.useVectorField = false;
         params.useProximityMap = false;
+//        params.minGrowth = 0.5;
+        params.maxGrowth = 0.25;
+        params.symmetricMaps = true;
         params.includeTransitShipsInScore = true;
         SpinGameState gameState = new SpinGameState().setParams(params).setPlanets();
-        gameState.actuators[0] = new SourceTargetActuator().setPlayerId(0);
-        gameState.actuators[1] = new SourceTargetActuator().setPlayerId(1);
+        gameState.actuators[0] = new SourceTargetJointActuator().setPlayerId(0);
+        gameState.actuators[1] = new SourceTargetJointActuator().setPlayerId(1);
         return gameState;
     }
 }
