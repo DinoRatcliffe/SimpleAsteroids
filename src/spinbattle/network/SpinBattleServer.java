@@ -4,6 +4,8 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.*;
+import java.security.Policy;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.function.BiFunction;
@@ -125,7 +127,7 @@ public class SpinBattleServer extends Thread {
 
     public void run() {
         SpinBattleParams currentParams = new SpinBattleParams();
-        SpinGameState currentGameState = restartStaticGame(globalRandom);
+        SpinGameState currentGameState = restartStaticGame(globalRandom, 6);
 
         try {
             double totalTime = 0;
@@ -145,8 +147,17 @@ public class SpinBattleServer extends Thread {
             SimplePlayerInterface randomPlayer = new agents.dummy.RandomAgent();
             SimplePlayerInterface doNothingPlayer = new DoNothingAgent();
             SimplePlayerInterface evoAgent = getPolicyEvoAgent(new RandomAgent());
+            ArrayList<SimplePlayerInterface> curriculumOpponnets = new ArrayList<SimplePlayerInterface>();
+            //curriculumOpponnets.add(randomPlayer);
+            for (int i = 1; i < 20; i+=2) {
+                PolicyEvoAgent pea = (PolicyEvoAgent) getPolicyEvoAgent(new RandomAgent());
+                pea.setNEvals(i);
+                curriculumOpponnets.add(pea);
+            }
+            int currentOpponent = 1;
+            int currentPlanets = 6;
+            int maxPlanets = 12;
             SimplePlayerInterface opponent = evoAgent;
-
             Random random = new Random();
             int playerFirst = random.nextInt(2);
 
@@ -162,8 +173,24 @@ public class SpinBattleServer extends Thread {
                 switch (cmd) {
                     case "set_observation_function": observationFunction = getObservationFunction(in);
                                                      break;
+                    case "increase_opponent": if (currentOpponent < curriculumOpponnets.size()) {
+                                                   //opponent = curriculumOpponnets.get(currentOpponent);
+                                                   System.out.println("Incrementing Opponent");
+                                                   System.out.println(((PolicyEvoAgent) opponent).getSequenceLength());
+                                                   System.out.println(((PolicyEvoAgent) opponent).getNEvals());
+                                                   currentOpponent++;
+                                              }
+                                              if (currentPlanets < maxPlanets) {
+                                                  currentPlanets += 2;
+                                              }
+                                              currentGameState = restartStaticGame(globalRandom, currentPlanets);
+                                              playerFirst = random.nextInt(2);
+                                              currentGameState.playerFirst = playerFirst;
+                                              System.out.println(currentGameState.planets.size());
+                                              sendGameState(out, currentGameState, observationFunction);
+                                              break;
                     case "set_params": currentParams = loadParams(in);
-                                       currentGameState = restartStaticGame(globalRandom);
+                                       currentGameState = restartStaticGame(globalRandom, currentPlanets);
                                        playerFirst = random.nextInt(2);
                                        currentGameState.playerFirst = playerFirst;
                                        sendGameState(out, currentGameState, observationFunction);
@@ -173,20 +200,20 @@ public class SpinBattleServer extends Thread {
                     case "set_state": currentGameState = loadGameState(in);
                                       break;
                     case "set_eval_games": this.evalServer = true;
-                                           currentGameState = restartStaticGame(globalRandom);
+                                           currentGameState = restartStaticGame(globalRandom, currentPlanets);
                                            playerFirst = random.nextInt(2);
                                            currentGameState.playerFirst = playerFirst;
                                            sendGameState(out, currentGameState, observationFunction);
                                            break;
                     case "set_random_games": this.evalServer = false;
-                                             currentGameState = restartStaticGame(globalRandom);
+                                             currentGameState = restartStaticGame(globalRandom, currentPlanets);
                                              playerFirst = random.nextInt(2);
                                              currentGameState.playerFirst = playerFirst;
                                              sendGameState(out, currentGameState, observationFunction);
                                              break;
                     case "get_state": sendGameState(out, currentGameState, observationFunction);
                                       break;
-                    case "reset":  currentGameState = restartStaticGame(globalRandom);
+                    case "reset":  currentGameState = restartStaticGame(globalRandom, currentPlanets);
                                    opponent.reset();
                                    playerFirst = random.nextInt(2);
                                    currentGameState.playerFirst = playerFirst;
@@ -206,7 +233,7 @@ public class SpinBattleServer extends Thread {
         }
     }
 
-    public SpinGameState restartStaticGame(Random globalRandom) {
+    public SpinGameState restartStaticGame(Random globalRandom, int planets) {
         // Game Setup
         if (this.evalServer) {
             SpinBattleParams.random = new Random(eval_seeds[current_eval_seed]);
@@ -220,7 +247,7 @@ public class SpinBattleServer extends Thread {
         params.width = (int) (params.width*1.5);
         params.height = (int) (params.height*1.5);
         params.maxTicks = 500;
-        params.nPlanets = 12;
+        params.nPlanets = planets;
         params.nToAllocate = 6;
         params.transitSpeed = 30;
         params.useVectorField = false;

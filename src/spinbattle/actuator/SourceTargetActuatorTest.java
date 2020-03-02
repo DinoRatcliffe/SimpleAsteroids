@@ -67,8 +67,8 @@ public class SourceTargetActuatorTest {
 
         SimplePlayerInterface evoAgent = getPolicyEvoAgent(new RandomAgent());
         SimplePlayerInterface player2 = new RandomAgent();
-        String checkpoint = "/mnt/storage-ssd/cma-planetwars/ntbea-experiments/single-player-joint-actuator-slow/0/models/1/saved_model";
-        SimplePlayerInterface annPlayer = new IterANNPlayer(checkpoint, 6, new IterConverter());
+        String checkpoint = "/home/dino/development/func-kit/tmp/cma-spingame-testing-12-random-inc-cur/test-cur-9/models/410/saved_model";
+        SimplePlayerInterface annPlayer = new IterANNPlayer(checkpoint, 12, new IterConverter());
         PolicyEvoAgent annPlayerEvo = getPolicyEvoAgent(annPlayer);
         annPlayerEvo.setUseMutationTransducer(false);
         annPlayerEvo.setMutateUsingPolicy(1.0);
@@ -125,7 +125,7 @@ public class SourceTargetActuatorTest {
                 gameState.next(actions);
                 // mouseSlingController.update();
                 // launcher.makeTransits(gameState, Constants.playerOne);
-//            if (i % launchPeriod == 0)
+//           if (i % launchPeriod == 0)
 //                launcher.makeTransits(gameState, Constants.playerTwo);
 //                SpinGameState viewCopy = (SpinGameState) gameState.copy();
 //                viewCopy.logger = gameState.logger;
@@ -198,12 +198,12 @@ public class SourceTargetActuatorTest {
 
     public static SpinGameState restartStaticGame() {
         // Game Setup
-        SpinBattleParams.random = new Random(31415);
+        //SpinBattleParams.random = new Random(31415);
         SpinBattleParams params = new SpinBattleParams();
         params.width = (int) (params.width*1.5);
         params.height = (int) (params.height*1.5);
         params.maxTicks = 500;
-        params.nPlanets = 6;
+        params.nPlanets = 12;
         params.nToAllocate = 6;
         params.transitSpeed = 30;
         params.useVectorField = false;
