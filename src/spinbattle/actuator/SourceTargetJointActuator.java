@@ -63,8 +63,8 @@ public class SourceTargetJointActuator implements Actuator {
             // shift 50%
             try {
                 transit.setPayload(source, source.shipCount / 2);
-                transit.launch(source.position, target.position, playerId, gameState);
                 transit.setTarget(targetPlanet);
+                transit.launch(source.position, target.position, playerId, gameState);
             } catch (Exception e) {
                 e.printStackTrace();
                 System.out.println("Transit = " + transit);

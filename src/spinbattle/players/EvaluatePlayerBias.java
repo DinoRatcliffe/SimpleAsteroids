@@ -22,8 +22,9 @@ import java.util.Random;
 
 public class EvaluatePlayerBias {
     public static void main(String[] args) throws Exception {
-        String outfile = args[0];
-        int nGames = Integer.parseInt(args[1]);
+        int planets = Integer.parseInt(args[0]);
+        String outfile = args[1];
+        int nGames = Integer.parseInt(args[2]);
 
         // csv scores output
         File csvOutput = new File(outfile);
@@ -31,7 +32,7 @@ public class EvaluatePlayerBias {
         csvWriter.write("game, score\n");
 
         // reset game
-        SpinGameState gameState = restartStaticGame();
+        SpinGameState gameState = restartStaticGame(planets);
         StatSummary scoreSummary = new StatSummary();
 
         // Agent setup
@@ -63,7 +64,7 @@ public class EvaluatePlayerBias {
             System.out.println(gameState.getScore());
             csvWriter.write(i + ", " + gameState.getScore() + "\n");
 
-            gameState = restartStaticGame();
+            gameState = restartStaticGame(planets);
         }
         csvWriter.flush();
         System.out.println(scoreSummary);
@@ -111,14 +112,14 @@ public class EvaluatePlayerBias {
         return evoAgent;
     }
 
-    public static SpinGameState restartStaticGame() {
+    public static SpinGameState restartStaticGame(int planets) {
         // Game Setup
         //SpinBattleParams.random = new Random(42);
         SpinBattleParams params = new SpinBattleParams();
         params.width = (int) (params.width*1.5);
         params.height = (int) (params.height*1.5);
         params.maxTicks = 500;
-        params.nPlanets = 12;
+        params.nPlanets = planets;
         params.nToAllocate = 6;
         params.transitSpeed = 30;
         params.useVectorField = false;

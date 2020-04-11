@@ -1,0 +1,46 @@
+syntax = "proto3";
+import "google/protobuf/wrappers.proto";
+package spinbattle.core;
+
+option java_package = "spinbattle.core";
+option java_outer_classname = "SpinGameStateProtos";
+
+message Transporter {
+  int32 parent = 1;
+  google.protobuf.Int32Value target = 2;
+  int32 ownedBy = 3;
+  double payload = 4;
+
+  double mosx = 5;
+  double mosy = 6;
+  double movx = 7;
+  double movy = 8;
+}
+
+message Planet {
+  double x = 1;
+  double y = 2;
+  int32 index = 5;
+  double growthRate = 6;
+  double shipCount = 7;
+  int32 ownedBy = 8;
+  Transporter transit = 9;
+}
+
+message Params {
+  int32 maxTicks = 3;
+}
+
+message SpinGameState {
+  int32 playerFirst = 15;
+  int32 totalTicks = 1;
+  int32 totalInstances = 2;
+  int32 nTicks = 3;
+
+  double currentScore = 4;
+
+  repeated Planet planets = 5;
+
+  Params params = 6;
+}
+

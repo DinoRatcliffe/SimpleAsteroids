@@ -2,6 +2,7 @@ package spinbattle.params;
 
 import math.Vector2d;
 import spinbattle.core.Collider;
+import spinbattle.core.SpinGameState;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -83,6 +84,38 @@ public class SpinBattleParams {
         return p;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SpinBattleParams other = (SpinBattleParams) obj;
+
+        return width == other.width &&
+                height == other.height &&
+                maxTicks == other.maxTicks &&
+                nPlanets == other.nPlanets &&
+                nToAllocate == other.nToAllocate &&
+                minGrowth == other.minGrowth &&
+                maxGrowth == other.maxGrowth &&
+                spinRatio == other.spinRatio &&
+                minInitialShips == other.minInitialShips &&
+                maxInitialShips == other.maxInitialShips &&
+                transitSpeed == other.transitSpeed &&
+                releasePeriod == other.releasePeriod &&
+                useProximityMap == other.useProximityMap &&
+                useVectorField == other.useVectorField &&
+                gravitationalFieldConstant == other.gravitationalFieldConstant &&
+                gravitationalForceConstant == other.gravitationalForceConstant &&
+                clampZeroScore == other.clampZeroScore &&
+                transportTax == other.transportTax &&
+                radSep == other.radSep &&
+                includeTransitShipsInScore == other.includeTransitShipsInScore &&
+                symmetricMaps == other.symmetricMaps;
+    }
     // these could be collapsed in to a single parameter
     // for functional purposes
     // but adjusting both of them gives a clumsy way to control the display

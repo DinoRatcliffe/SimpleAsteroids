@@ -26,11 +26,12 @@ import java.util.function.BiFunction;
 
 public class EvaluateFlatANNPlayer {
     public static void main(String[] args) throws Exception {
-        String netType = args[0];
-        String opponentType = args[1];
-        String checkpoint = args[2];
-        String outfile = args[3];
-        int nGames = Integer.parseInt(args[4]);
+        int planets = Integer.parseInt(args[0]);
+        String netType = args[1];
+        String opponentType = args[2];
+        String checkpoint = args[3];
+        String outfile = args[4];
+        int nGames = Integer.parseInt(args[5]);
 
         // csv scores output
         File csvOutput = new File(outfile);
@@ -38,15 +39,15 @@ public class EvaluateFlatANNPlayer {
         csvWriter.write("game, score\n");
 
         // reset game
-        SpinGameState gameState = restartStaticGame();
+        SpinGameState gameState = restartStaticGame(planets);
         StatSummary scoreSummary = new StatSummary();
 
         // Agent setup
         SimplePlayerInterface annPlayer;
         if (netType.equals("flat")) {
-            annPlayer = new FlatANNPlayer(checkpoint, 6, new FlatConverter()); // Change to be argument passed in
+            annPlayer = new FlatANNPlayer(checkpoint, planets, new FlatConverter()); // Change to be argument passed in
         } else {
-            annPlayer = new IterANNPlayer(checkpoint, 12, new IterConverter());
+            annPlayer = new IterANNPlayer(checkpoint, planets, new IterConverter());
         }
 
         SimplePlayerInterface opponentAgent;
@@ -82,7 +83,7 @@ public class EvaluateFlatANNPlayer {
             System.out.println(gameState.currentScore);
             csvWriter.write(i + ", " + gameState.getScore() + "\n");
 
-            gameState = restartStaticGame();
+            gameState = restartStaticGame(planets);
         }
         csvWriter.flush();
         //System.out.println(scoreSummary);
@@ -90,7 +91,7 @@ public class EvaluateFlatANNPlayer {
 
     }
 
-    public static SpinGameState restartStaticGame() {
+    public static SpinGameState restartStaticGame(int planets) {
         // long[] eval_seeds = {-6330548296303013003L,};
         // Game Setup
         //SpinBattleParams.random = new Random(42);
@@ -98,7 +99,7 @@ public class EvaluateFlatANNPlayer {
         params.width = (int) (params.width*1.5);
         params.height = (int) (params.height*1.5);
         params.maxTicks = 500;
-        params.nPlanets = 12;
+        params.nPlanets = planets;
         params.nToAllocate = 6;
         params.transitSpeed = 30;
         params.useVectorField = false;

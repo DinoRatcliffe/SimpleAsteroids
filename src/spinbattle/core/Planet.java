@@ -35,6 +35,33 @@ public class Planet {
         return planet;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Planet other = (Planet) obj;
+
+        boolean transitMatch = false;
+        if (transit == null) {
+            transitMatch = other.transit == null;
+        } else {
+            transitMatch = transit.equals(other.transit);
+        }
+
+        return position.equals(other.position) &&
+                rotation == other.rotation &&
+                rotationRate == other.rotationRate &&
+                growthRate == other.growthRate &&
+                shipCount == other.shipCount &&
+                ownedBy == other.ownedBy &&
+                index == other.index &&
+                transitMatch;
+    }
+
     Planet processIncoming(double incomingShips, int playerId, SpinGameState gameState) {
         if (ownedBy != playerId) {
             // this is an invasion

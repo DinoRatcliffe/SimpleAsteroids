@@ -20,12 +20,13 @@ import java.util.Random;
 
 public class EvaluatePolicyRHEAANN {
     public static void main(String[] args) throws Exception {
-        String netType = args[0];
-        String opponentType = args[1];
-        String checkpoint = args[2];
-        String outfile = args[3];
-        int nGames = Integer.parseInt(args[4]);
-        String paramsFile = args[5];
+        int planets = Integer.parseInt(args[0]);
+        String netType = args[1];
+        String opponentType = args[2];
+        String checkpoint = args[3];
+        String outfile = args[4];
+        int nGames = Integer.parseInt(args[5]);
+        String paramsFile = args[6];
 
         double probMutation = 0.2;
         double initUsingPolicy = 0.8;
@@ -50,7 +51,7 @@ public class EvaluatePolicyRHEAANN {
         csvWriter.write("game, score\n");
 
         // reset game
-        SpinGameState gameState = restartStaticGame();
+        SpinGameState gameState = restartStaticGame(planets);
         StatSummary scoreSummary = new StatSummary();
 
         // Agent setup
@@ -61,9 +62,9 @@ public class EvaluatePolicyRHEAANN {
         PolicyEvoAgent player;
 
         if (netType.equals("flat")) {
-            annPlayer = new FlatANNPlayer(checkpoint, 6, new FlatConverter()); // Change to be argument passed in
+            annPlayer = new FlatANNPlayer(checkpoint, planets, new FlatConverter()); // Change to be argument passed in
         } else {
-            annPlayer = new IterANNPlayer(checkpoint, 12, new IterConverter());
+            annPlayer = new IterANNPlayer(checkpoint, planets, new IterConverter());
         }
 
         player = (PolicyEvoAgent) getPolicyEvoAgent(annPlayer);
@@ -105,7 +106,7 @@ public class EvaluatePolicyRHEAANN {
             System.out.println(gameState.getScore());
             csvWriter.write(i + ", " + gameState.getScore() + "\n");
 
-            gameState = restartStaticGame();
+            gameState = restartStaticGame(planets);
         }
         csvWriter.flush();
         System.out.println(scoreSummary);
@@ -153,7 +154,7 @@ public class EvaluatePolicyRHEAANN {
         return evoAgent;
     }
 
-    public static SpinGameState restartStaticGame() {
+    public static SpinGameState restartStaticGame(int planets) {
         // Game Setup
         //long seed = 42;
         //System.out.println("Setting seed to: " + seed);
@@ -162,7 +163,7 @@ public class EvaluatePolicyRHEAANN {
         params.width = (int) (params.width*1.5);
         params.height = (int) (params.height*1.5);
         params.maxTicks = 500;
-        params.nPlanets = 12;
+        params.nPlanets = planets;
         params.nToAllocate = 6;
         params.transitSpeed = 30;
         params.useVectorField = false;

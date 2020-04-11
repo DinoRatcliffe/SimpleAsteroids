@@ -27,6 +27,7 @@ dependencies {
   compile("com.google.code.gson:gson:2.8.6")
   compile("org.tensorflow:tensorflow:1.15.0")
   compile("jdom:jdom:1.0")
+  compile("com.google.protobuf:protobuf-java:3.11.0")
 }
 
 application {
@@ -37,6 +38,20 @@ tasks.register<JavaExec>("serve") {
     group = "Runner"
     description = "Runs spinbattle server"
     main = "spinbattle.network.SpinBattleServer"
+    classpath = sourceSets["main"].runtimeClasspath
+}
+
+tasks.register<JavaExec>("serveproto") {
+    group = "Runner"
+    description = "Runs spinbattle server"
+    main = "spinbattle.network.SpinBattleServerProto"
+    classpath = sourceSets["main"].runtimeClasspath
+}
+
+tasks.register<JavaExec>("proto") {
+    group = "Runner"
+    description = "Runs spinbattle test"
+    main = "spinbattle.core.TestGameStateProto"
     classpath = sourceSets["main"].runtimeClasspath
 }
 

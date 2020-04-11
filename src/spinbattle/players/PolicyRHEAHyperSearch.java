@@ -14,26 +14,31 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class PolicyRHEAHyperSearch {
     public static void main(String[] args) throws IOException {
-        String netType = args[0];
-        String checkpoint = args[1];
-        String outfile = args[2];
+        int planets = Integer.parseInt(args[0]);
+        String netType = args[1];
+        String checkpoint = args[2];
+        String outfile = args[3];
 
+        int lastidx = outfile.lastIndexOf('/');
+        Files.createDirectories(Paths.get(outfile.substring(0, lastidx)));
         File csvOutput = new File(outfile);
         BufferedWriter csvWriter = new BufferedWriter(new FileWriter(csvOutput));
 
         SimplePlayerInterface annPlayer;
         if (netType.equals("flat")) {
-            annPlayer = new FlatANNPlayer(checkpoint, 6, new FlatConverter()); // Change to be argument passed in
+            annPlayer = new FlatANNPlayer(checkpoint, planets, new FlatConverter()); // Change to be argument passed in
         } else {
-            annPlayer = new IterANNPlayer(checkpoint, 12, new IterConverter());
+            annPlayer = new IterANNPlayer(checkpoint, planets, new IterConverter());
         }
 
-        PolicyEvoSearchSpace searchSpace = new PolicyEvoSearchSpace(annPlayer);
+        PolicyEvoSearchSpace searchSpace = new PolicyEvoSearchSpace(annPlayer, planets);
 
-        int nEvals = 2000;
+        int nEvals = 5000;
         System.out.println("Optimization budget: " + nEvals);
         NTupleBanditEA ntbea = new NTupleBanditEA().setKExplore(5000);
         ntbea.logBestYet = true;
@@ -46,7 +51,7 @@ public class PolicyRHEAHyperSearch {
 
         ntbea.setModel(model);
 
-        int nChecks = 1;
+        int nChecks = 0;
         int nTrials = 1;
 
         ElapsedTimer timer = new ElapsedTimer();

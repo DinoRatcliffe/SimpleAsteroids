@@ -94,6 +94,10 @@ public class SpinBattleServer extends Thread {
         return gson.fromJson(jsonParams, SpinBattleParams.class);
     }
 
+    private int loadPlanets(Scanner in) {
+        return Integer.parseInt(in.nextLine());
+    }
+
     private int loadAction(Scanner in) {
         String actionStr = in.nextLine();
         return Integer.parseInt(actionStr);
@@ -146,7 +150,7 @@ public class SpinBattleServer extends Thread {
 
             SimplePlayerInterface randomPlayer = new agents.dummy.RandomAgent();
             SimplePlayerInterface doNothingPlayer = new DoNothingAgent();
-            SimplePlayerInterface evoAgent = getPolicyEvoAgent(new RandomAgent());
+            SimplePlayerInterface evoPolicyAgent = getPolicyEvoAgent(new RandomAgent());
             ArrayList<SimplePlayerInterface> curriculumOpponnets = new ArrayList<SimplePlayerInterface>();
             //curriculumOpponnets.add(randomPlayer);
             for (int i = 1; i < 20; i+=2) {
@@ -154,6 +158,7 @@ public class SpinBattleServer extends Thread {
                 pea.setNEvals(i);
                 curriculumOpponnets.add(pea);
             }
+            SimplePlayerInterface evoAgent = getEvoAgent();
             int currentOpponent = 1;
             int currentPlanets = 6;
             int maxPlanets = 12;
@@ -189,6 +194,13 @@ public class SpinBattleServer extends Thread {
                                               System.out.println(currentGameState.planets.size());
                                               sendGameState(out, currentGameState, observationFunction);
                                               break;
+                    case "set_planets": currentPlanets = loadPlanets(in);
+                                        currentGameState = restartStaticGame(globalRandom, currentPlanets);
+                                        playerFirst = random.nextInt(2);
+                                        currentGameState.playerFirst = playerFirst;
+                                        System.out.println(currentGameState.planets.size());
+                                        sendGameState(out, currentGameState, observationFunction);
+                                        break;
                     case "set_params": currentParams = loadParams(in);
                                        currentGameState = restartStaticGame(globalRandom, currentPlanets);
                                        playerFirst = random.nextInt(2);
@@ -288,7 +300,7 @@ public class SpinBattleServer extends Thread {
         int nEvals = 20;
         int seqLength = 100;
         EvoAgent evoAgent = new EvoAgent().setEvoAlg(evoAlg, nEvals).setSequenceLength(seqLength);
-        boolean useShiftBuffer = true;
+        boolean useShiftBuffer = false;
         evoAgent.setUseShiftBuffer(useShiftBuffer);
         //evoAgent.setVisual();
 
@@ -307,7 +319,7 @@ public class SpinBattleServer extends Thread {
     public static void main(String[] args) throws Exception {
         ServerSocket serverSocket = new ServerSocket();
         serverSocket.setReceiveBufferSize(4096*2);
-        serverSocket.bind(new InetSocketAddress(InetAddress.getByName("127.0.0.1"), defaultPort));
+        serverSocket.bind(new InetSocketAddress(InetAddress.getByName("0.0.0.0"), defaultPort));
         serverSocket.setPerformancePreferences(0, 2, 1);
         int i = 0;
         while (true) {

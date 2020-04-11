@@ -34,7 +34,7 @@ public class PolicyEvoSearchSpace implements AnnotatedFitnessSpace {
             annPlayer = new IterANNPlayer(checkpoint, 6, new IterConverter());
         }
 
-        PolicyEvoSearchSpace searchSpace = new PolicyEvoSearchSpace(annPlayer);
+        PolicyEvoSearchSpace searchSpace = new PolicyEvoSearchSpace(annPlayer, 6);
         int[] point = SearchSpaceUtil.randomPoint(searchSpace);
 
         System.out.println(searchSpace.report(point));
@@ -67,9 +67,10 @@ public class PolicyEvoSearchSpace implements AnnotatedFitnessSpace {
 
     // log the solutions found
     public EvolutionLogger logger;
-    public PolicyEvoSearchSpace(SimplePlayerInterface guidanceAgent) {
+    int planets;
+    public PolicyEvoSearchSpace(SimplePlayerInterface guidanceAgent, int planets) {
         this.guidanceAgent = guidanceAgent;
-
+        this.planets = planets;
         evoAgent = getPolicyEvoAgent(guidanceAgent);
         evoAgent.setUseMutationTransducer(false);
 
@@ -123,7 +124,7 @@ public class PolicyEvoSearchSpace implements AnnotatedFitnessSpace {
             evoAgent.reset();
             opponentAgent.reset();
             playerFirst = random.nextInt(2);
-            gameState = restartStaticGame();
+            gameState = restartStaticGame(this.planets);
             gameState.playerFirst = playerFirst;
             while(!gameState.isTerminal()) {
                 if (playerFirst == 0) {
@@ -198,13 +199,13 @@ public class PolicyEvoSearchSpace implements AnnotatedFitnessSpace {
         return evoAgent;
     }
 
-    public static SpinGameState restartStaticGame() {
+    public static SpinGameState restartStaticGame(int planets) {
         // Game Setup
         SpinBattleParams params = new SpinBattleParams();
         params.width = (int) (params.width*1.5);
         params.height = (int) (params.height*1.5);
         params.maxTicks = 500;
-        params.nPlanets = 12;
+        params.nPlanets = planets;
         params.nToAllocate = 6;
         params.transitSpeed = 30;
         params.useVectorField = false;

@@ -2,9 +2,14 @@ package spinbattle.core;
 
 import ggi.core.AbstractGameState;
 import logger.sample.DefaultLogger;
+import math.Vector2d;
 import spinbattle.actuator.Actuator;
 import spinbattle.params.Constants;
 import spinbattle.params.SpinBattleParams;
+import spinbattle.util.MovableObject;
+import sun.security.provider.ConfigFile;
+
+import com.google.protobuf.Int32Value;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,6 +54,39 @@ public class SpinGameState implements AbstractGameState {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SpinGameState other = (SpinGameState) obj;
+        boolean allPlanetsEqual = true;
+        for (int i = 0; i < planets.size(); i++) {
+            if (!planets.get(i).equals(other.planets.get(i))) {
+                allPlanetsEqual = false;
+            }
+        }
+
+        System.out.println("TESTING EQUAL");
+        System.out.println(playerFirst == other.playerFirst);
+        System.out.println(totalTicks == other.totalTicks);
+        System.out.println(nTicks == other.nTicks);
+        System.out.println(currentScore == other.currentScore);
+        System.out.println(params.equals(other.params));
+        System.out.println(allPlanetsEqual);
+        System.out.println("DONE TESTING EQUAL");
+
+        return playerFirst == other.playerFirst &&
+                totalTicks == other.totalTicks &&
+                nTicks == other.nTicks &&
+                currentScore == other.currentScore &&
+                params.equals(other.params) &&
+                allPlanetsEqual;
+    }
+
+    @Override
     public AbstractGameState copy() {
         SpinGameState copy = new SpinGameState();
         // just shallow-copy the params
@@ -78,13 +116,13 @@ public class SpinGameState implements AbstractGameState {
     public AbstractGameState next(int[] actions) {
         // System.out.println(Arrays.toString(actions));
 
-        Collections.shuffle(playerIndicies);
+        //Collections.shuffle(playerIndicies);
+
         for (int i : playerIndicies) {
-            if (actuators[i] != null)
-                actuators[i].actuate(actions[i], this);
+            actuators[i].actuate(actions[i], this);
         }
 
-        Collections.shuffle(planetIndicies);
+        //Collections.shuffle(planetIndicies);
         for (int i : planetIndicies) {
             planets.get(i).update(this);
         }
@@ -165,7 +203,7 @@ public class SpinGameState implements AbstractGameState {
         return this;
     }
 
-    static int maxTries = 200;
+    static int maxTries = 1000;
 
     public SpinGameState setPlanets() {
         SpinGameState newState;
@@ -351,4 +389,88 @@ public class SpinGameState implements AbstractGameState {
         }
     }
     // todo - set up the planets based on the params that have been passed
+
+    public static SpinGameState byteToState(byte[] message) throws Exception {
+        SpinGameStateProtos.SpinGameState gs = SpinGameStateProtos.SpinGameState.parseFrom(message);
+        SpinGameState newGs = new SpinGameState();
+
+        // set Planets
+        ArrayList<Planet> planets = new ArrayList<Planet>();
+        for (SpinGameStateProtos.Planet p : gs.getPlanetsList()) {
+            Planet newPlanet = new Planet();
+            newPlanet.position = new Vector2d(p.getX(), p.getY());
+            newPlanet.index = p.getIndex();
+            newPlanet.growthRate = p.getGrowthRate();
+            newPlanet.shipCount = p.getShipCount();
+            newPlanet.ownedBy = p.getOwnedBy();
+
+            SpinGameStateProtos.Transporter t = p.getTransit();
+            if (!t.getDefaultInstanceForType().equals(t)) {
+                Transporter newTransporter = new Transporter();
+                newTransporter.parent = t.getParent();
+                newTransporter.target = t.getTarget().getValue();
+                newTransporter.ownedBy = t.getOwnedBy();
+                newTransporter.payload = t.getPayload();
+
+                MovableObject mo = new MovableObject();
+                mo.s = new Vector2d(t.getMosx(), t.getMosy());
+                mo.v = new Vector2d(t.getMovx(), t.getMovy());
+                newTransporter.mo = mo;
+
+                newPlanet.transit = newTransporter;
+            }
+            planets.add(newPlanet);
+        }
+
+        // set other
+        newGs.playerFirst = gs.getPlayerFirst();
+        newGs.totalTicks = gs.getTotalTicks();
+        newGs.nTicks = gs.getNTicks();
+        newGs.currentScore = gs.getCurrentScore();
+        newGs.planets = planets;
+
+        return newGs;
+    }
+
+    public static byte[] toByteArray(SpinGameState state) {
+        SpinGameStateProtos.Params.Builder paramsBuilder = SpinGameStateProtos.Params.newBuilder();
+        paramsBuilder.setMaxTicks(state.params.maxTicks);
+
+        SpinGameStateProtos.SpinGameState.Builder gsBuilder = SpinGameStateProtos.SpinGameState.newBuilder();
+        gsBuilder.setPlayerFirst(state.playerFirst)
+                .setTotalTicks(state.totalTicks)
+                .setNTicks(state.nTicks)
+                .setCurrentScore(state.currentScore)
+                .setParams(paramsBuilder);
+
+        SpinGameStateProtos.Planet.Builder planetBuilder;
+        SpinGameStateProtos.Transporter.Builder transporterBuilder;
+        Transporter trans;
+        for (Planet p : state.planets) {
+            planetBuilder = SpinGameStateProtos.Planet.newBuilder();
+            planetBuilder.setX(p.position.x)
+                    .setY(p.position.y)
+                    .setIndex(p.index)
+                    .setGrowthRate(p.growthRate)
+                    .setShipCount(p.shipCount)
+                    .setOwnedBy(p.ownedBy);
+
+            trans = p.transit;
+            if (trans != null && trans.target != null) {
+                transporterBuilder = SpinGameStateProtos.Transporter.newBuilder();
+                transporterBuilder.setMosx(trans.mo.s.x)
+                        .setMosy(trans.mo.s.y)
+                        .setMovx(trans.mo.v.x)
+                        .setMovy(trans.mo.v.y)
+                        .setTarget(Int32Value.newBuilder().setValue(trans.target))
+                        .setParent(trans.parent)
+                        .setOwnedBy(trans.ownedBy)
+                        .setPayload(trans.payload);
+                planetBuilder.setTransit(transporterBuilder);
+            }
+
+            gsBuilder.addPlanets(planetBuilder);
+        }
+        return gsBuilder.build().toByteArray();
+    }
 }

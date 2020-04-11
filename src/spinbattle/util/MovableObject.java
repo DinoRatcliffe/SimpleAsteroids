@@ -1,7 +1,10 @@
 package spinbattle.util;
 
 import math.Vector2d;
+import spinbattle.core.Planet;
 import spinbattle.core.VectorField;
+
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 
 public class MovableObject {
     public Vector2d s;
@@ -25,6 +28,19 @@ public class MovableObject {
             s.add(v);
         }
         return this;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        MovableObject other = (MovableObject) obj;
+        return s.equals(other.s) &&
+                v.equals(other.v);
     }
 
     public String toString() {

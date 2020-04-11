@@ -44,7 +44,24 @@ public class Transporter {
         return String.format("%d -> %d (%.1f) >> %s", parent, target, payload, mo);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null && target == null)
+            return true;
+        else if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass())
+            return false;
+        Transporter other = (Transporter) obj;
 
+        return parent == other.parent &&
+                target.intValue() == other.target.intValue() &&
+                ownedBy == other.ownedBy &&
+                mo.equals(mo);
+    }
     public Transporter next(VectorField vf) {
         if (mo != null) {
             mo.update(vf);
@@ -65,6 +82,7 @@ public class Transporter {
     public Transporter terminateJourney() {
         payload = 0;
         mo = null;
+        target = null;
         return this;
     }
 
