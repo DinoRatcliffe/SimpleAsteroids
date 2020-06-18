@@ -19,7 +19,6 @@ import spinbattle.params.SpinBattleParams;
 import spinbattle.players.FlatConverter;
 import spinbattle.players.ImageObservationConverter;
 import spinbattle.players.IterConverter;
-import sun.java2d.pipe.SpanShapeRenderer;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;

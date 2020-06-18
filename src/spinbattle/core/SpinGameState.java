@@ -7,7 +7,6 @@ import spinbattle.actuator.Actuator;
 import spinbattle.params.Constants;
 import spinbattle.params.SpinBattleParams;
 import spinbattle.util.MovableObject;
-import sun.security.provider.ConfigFile;
 
 import com.google.protobuf.Int32Value;
 
