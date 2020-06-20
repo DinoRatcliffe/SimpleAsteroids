@@ -78,7 +78,7 @@ public final class SpinGameStateProtos {
   /**
    * Protobuf type {@code spinbattle.core.Transporter}
    */
-  public  static final class Transporter extends
+  public static final class Transporter extends
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:spinbattle.core.Transporter)
       TransporterOrBuilder {
@@ -206,6 +206,7 @@ public final class SpinGameStateProtos {
      * <code>int32 parent = 1;</code>
      * @return The parent.
      */
+    @java.lang.Override
     public int getParent() {
       return parent_;
     }
@@ -216,6 +217,7 @@ public final class SpinGameStateProtos {
      * <code>.google.protobuf.Int32Value target = 2;</code>
      * @return Whether the target field is set.
      */
+    @java.lang.Override
     public boolean hasTarget() {
       return target_ != null;
     }
@@ -223,12 +225,14 @@ public final class SpinGameStateProtos {
      * <code>.google.protobuf.Int32Value target = 2;</code>
      * @return The target.
      */
+    @java.lang.Override
     public com.google.protobuf.Int32Value getTarget() {
       return target_ == null ? com.google.protobuf.Int32Value.getDefaultInstance() : target_;
     }
     /**
      * <code>.google.protobuf.Int32Value target = 2;</code>
      */
+    @java.lang.Override
     public com.google.protobuf.Int32ValueOrBuilder getTargetOrBuilder() {
       return getTarget();
     }
@@ -239,6 +243,7 @@ public final class SpinGameStateProtos {
      * <code>int32 ownedBy = 3;</code>
      * @return The ownedBy.
      */
+    @java.lang.Override
     public int getOwnedBy() {
       return ownedBy_;
     }
@@ -249,6 +254,7 @@ public final class SpinGameStateProtos {
      * <code>double payload = 4;</code>
      * @return The payload.
      */
+    @java.lang.Override
     public double getPayload() {
       return payload_;
     }
@@ -259,6 +265,7 @@ public final class SpinGameStateProtos {
      * <code>double mosx = 5;</code>
      * @return The mosx.
      */
+    @java.lang.Override
     public double getMosx() {
       return mosx_;
     }
@@ -269,6 +276,7 @@ public final class SpinGameStateProtos {
      * <code>double mosy = 6;</code>
      * @return The mosy.
      */
+    @java.lang.Override
     public double getMosy() {
       return mosy_;
     }
@@ -279,6 +287,7 @@ public final class SpinGameStateProtos {
      * <code>double movx = 7;</code>
      * @return The movx.
      */
+    @java.lang.Override
     public double getMovx() {
       return movx_;
     }
@@ -289,6 +298,7 @@ public final class SpinGameStateProtos {
      * <code>double movy = 8;</code>
      * @return The movy.
      */
+    @java.lang.Override
     public double getMovy() {
       return movy_;
     }
@@ -742,6 +752,7 @@ public final class SpinGameStateProtos {
        * <code>int32 parent = 1;</code>
        * @return The parent.
        */
+      @java.lang.Override
       public int getParent() {
         return parent_;
       }
@@ -891,6 +902,7 @@ public final class SpinGameStateProtos {
        * <code>int32 ownedBy = 3;</code>
        * @return The ownedBy.
        */
+      @java.lang.Override
       public int getOwnedBy() {
         return ownedBy_;
       }
@@ -921,6 +933,7 @@ public final class SpinGameStateProtos {
        * <code>double payload = 4;</code>
        * @return The payload.
        */
+      @java.lang.Override
       public double getPayload() {
         return payload_;
       }
@@ -951,6 +964,7 @@ public final class SpinGameStateProtos {
        * <code>double mosx = 5;</code>
        * @return The mosx.
        */
+      @java.lang.Override
       public double getMosx() {
         return mosx_;
       }
@@ -981,6 +995,7 @@ public final class SpinGameStateProtos {
        * <code>double mosy = 6;</code>
        * @return The mosy.
        */
+      @java.lang.Override
       public double getMosy() {
         return mosy_;
       }
@@ -1011,6 +1026,7 @@ public final class SpinGameStateProtos {
        * <code>double movx = 7;</code>
        * @return The movx.
        */
+      @java.lang.Override
       public double getMovx() {
         return movx_;
       }
@@ -1041,6 +1057,7 @@ public final class SpinGameStateProtos {
        * <code>double movy = 8;</code>
        * @return The movy.
        */
+      @java.lang.Override
       public double getMovy() {
         return movy_;
       }
@@ -1176,7 +1193,7 @@ public final class SpinGameStateProtos {
   /**
    * Protobuf type {@code spinbattle.core.Planet}
    */
-  public  static final class Planet extends
+  public static final class Planet extends
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:spinbattle.core.Planet)
       PlanetOrBuilder {
@@ -1299,6 +1316,7 @@ public final class SpinGameStateProtos {
      * <code>double x = 1;</code>
      * @return The x.
      */
+    @java.lang.Override
     public double getX() {
       return x_;
     }
@@ -1309,6 +1327,7 @@ public final class SpinGameStateProtos {
      * <code>double y = 2;</code>
      * @return The y.
      */
+    @java.lang.Override
     public double getY() {
       return y_;
     }
@@ -1319,6 +1338,7 @@ public final class SpinGameStateProtos {
      * <code>int32 index = 5;</code>
      * @return The index.
      */
+    @java.lang.Override
     public int getIndex() {
       return index_;
     }
@@ -1329,6 +1349,7 @@ public final class SpinGameStateProtos {
      * <code>double growthRate = 6;</code>
      * @return The growthRate.
      */
+    @java.lang.Override
     public double getGrowthRate() {
       return growthRate_;
     }
@@ -1339,6 +1360,7 @@ public final class SpinGameStateProtos {
      * <code>double shipCount = 7;</code>
      * @return The shipCount.
      */
+    @java.lang.Override
     public double getShipCount() {
       return shipCount_;
     }
@@ -1349,6 +1371,7 @@ public final class SpinGameStateProtos {
      * <code>int32 ownedBy = 8;</code>
      * @return The ownedBy.
      */
+    @java.lang.Override
     public int getOwnedBy() {
       return ownedBy_;
     }
@@ -1359,6 +1382,7 @@ public final class SpinGameStateProtos {
      * <code>.spinbattle.core.Transporter transit = 9;</code>
      * @return Whether the transit field is set.
      */
+    @java.lang.Override
     public boolean hasTransit() {
       return transit_ != null;
     }
@@ -1366,12 +1390,14 @@ public final class SpinGameStateProtos {
      * <code>.spinbattle.core.Transporter transit = 9;</code>
      * @return The transit.
      */
+    @java.lang.Override
     public spinbattle.core.SpinGameStateProtos.Transporter getTransit() {
       return transit_ == null ? spinbattle.core.SpinGameStateProtos.Transporter.getDefaultInstance() : transit_;
     }
     /**
      * <code>.spinbattle.core.Transporter transit = 9;</code>
      */
+    @java.lang.Override
     public spinbattle.core.SpinGameStateProtos.TransporterOrBuilder getTransitOrBuilder() {
       return getTransit();
     }
@@ -1806,6 +1832,7 @@ public final class SpinGameStateProtos {
        * <code>double x = 1;</code>
        * @return The x.
        */
+      @java.lang.Override
       public double getX() {
         return x_;
       }
@@ -1836,6 +1863,7 @@ public final class SpinGameStateProtos {
        * <code>double y = 2;</code>
        * @return The y.
        */
+      @java.lang.Override
       public double getY() {
         return y_;
       }
@@ -1866,6 +1894,7 @@ public final class SpinGameStateProtos {
        * <code>int32 index = 5;</code>
        * @return The index.
        */
+      @java.lang.Override
       public int getIndex() {
         return index_;
       }
@@ -1896,6 +1925,7 @@ public final class SpinGameStateProtos {
        * <code>double growthRate = 6;</code>
        * @return The growthRate.
        */
+      @java.lang.Override
       public double getGrowthRate() {
         return growthRate_;
       }
@@ -1926,6 +1956,7 @@ public final class SpinGameStateProtos {
        * <code>double shipCount = 7;</code>
        * @return The shipCount.
        */
+      @java.lang.Override
       public double getShipCount() {
         return shipCount_;
       }
@@ -1956,6 +1987,7 @@ public final class SpinGameStateProtos {
        * <code>int32 ownedBy = 8;</code>
        * @return The ownedBy.
        */
+      @java.lang.Override
       public int getOwnedBy() {
         return ownedBy_;
       }
@@ -2161,11 +2193,23 @@ public final class SpinGameStateProtos {
      * @return The maxTicks.
      */
     int getMaxTicks();
+
+    /**
+     * <code>int32 width = 800;</code>
+     * @return The width.
+     */
+    int getWidth();
+
+    /**
+     * <code>int32 height = 600;</code>
+     * @return The height.
+     */
+    int getHeight();
   }
   /**
    * Protobuf type {@code spinbattle.core.Params}
    */
-  public  static final class Params extends
+  public static final class Params extends
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:spinbattle.core.Params)
       ParamsOrBuilder {
@@ -2212,6 +2256,16 @@ public final class SpinGameStateProtos {
               maxTicks_ = input.readInt32();
               break;
             }
+            case 4800: {
+
+              height_ = input.readInt32();
+              break;
+            }
+            case 6400: {
+
+              width_ = input.readInt32();
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -2250,8 +2304,31 @@ public final class SpinGameStateProtos {
      * <code>int32 maxTicks = 3;</code>
      * @return The maxTicks.
      */
+    @java.lang.Override
     public int getMaxTicks() {
       return maxTicks_;
+    }
+
+    public static final int WIDTH_FIELD_NUMBER = 800;
+    private int width_;
+    /**
+     * <code>int32 width = 800;</code>
+     * @return The width.
+     */
+    @java.lang.Override
+    public int getWidth() {
+      return width_;
+    }
+
+    public static final int HEIGHT_FIELD_NUMBER = 600;
+    private int height_;
+    /**
+     * <code>int32 height = 600;</code>
+     * @return The height.
+     */
+    @java.lang.Override
+    public int getHeight() {
+      return height_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -2271,6 +2348,12 @@ public final class SpinGameStateProtos {
       if (maxTicks_ != 0) {
         output.writeInt32(3, maxTicks_);
       }
+      if (height_ != 0) {
+        output.writeInt32(600, height_);
+      }
+      if (width_ != 0) {
+        output.writeInt32(800, width_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -2283,6 +2366,14 @@ public final class SpinGameStateProtos {
       if (maxTicks_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(3, maxTicks_);
+      }
+      if (height_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(600, height_);
+      }
+      if (width_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(800, width_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2301,6 +2392,10 @@ public final class SpinGameStateProtos {
 
       if (getMaxTicks()
           != other.getMaxTicks()) return false;
+      if (getWidth()
+          != other.getWidth()) return false;
+      if (getHeight()
+          != other.getHeight()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -2314,6 +2409,10 @@ public final class SpinGameStateProtos {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + MAXTICKS_FIELD_NUMBER;
       hash = (53 * hash) + getMaxTicks();
+      hash = (37 * hash) + WIDTH_FIELD_NUMBER;
+      hash = (53 * hash) + getWidth();
+      hash = (37 * hash) + HEIGHT_FIELD_NUMBER;
+      hash = (53 * hash) + getHeight();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -2449,6 +2548,10 @@ public final class SpinGameStateProtos {
         super.clear();
         maxTicks_ = 0;
 
+        width_ = 0;
+
+        height_ = 0;
+
         return this;
       }
 
@@ -2476,6 +2579,8 @@ public final class SpinGameStateProtos {
       public spinbattle.core.SpinGameStateProtos.Params buildPartial() {
         spinbattle.core.SpinGameStateProtos.Params result = new spinbattle.core.SpinGameStateProtos.Params(this);
         result.maxTicks_ = maxTicks_;
+        result.width_ = width_;
+        result.height_ = height_;
         onBuilt();
         return result;
       }
@@ -2527,6 +2632,12 @@ public final class SpinGameStateProtos {
         if (other.getMaxTicks() != 0) {
           setMaxTicks(other.getMaxTicks());
         }
+        if (other.getWidth() != 0) {
+          setWidth(other.getWidth());
+        }
+        if (other.getHeight() != 0) {
+          setHeight(other.getHeight());
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -2561,6 +2672,7 @@ public final class SpinGameStateProtos {
        * <code>int32 maxTicks = 3;</code>
        * @return The maxTicks.
        */
+      @java.lang.Override
       public int getMaxTicks() {
         return maxTicks_;
       }
@@ -2582,6 +2694,68 @@ public final class SpinGameStateProtos {
       public Builder clearMaxTicks() {
         
         maxTicks_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int width_ ;
+      /**
+       * <code>int32 width = 800;</code>
+       * @return The width.
+       */
+      @java.lang.Override
+      public int getWidth() {
+        return width_;
+      }
+      /**
+       * <code>int32 width = 800;</code>
+       * @param value The width to set.
+       * @return This builder for chaining.
+       */
+      public Builder setWidth(int value) {
+        
+        width_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 width = 800;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearWidth() {
+        
+        width_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int height_ ;
+      /**
+       * <code>int32 height = 600;</code>
+       * @return The height.
+       */
+      @java.lang.Override
+      public int getHeight() {
+        return height_;
+      }
+      /**
+       * <code>int32 height = 600;</code>
+       * @param value The height to set.
+       * @return This builder for chaining.
+       */
+      public Builder setHeight(int value) {
+        
+        height_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 height = 600;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearHeight() {
+        
+        height_ = 0;
         onChanged();
         return this;
       }
@@ -2714,7 +2888,7 @@ public final class SpinGameStateProtos {
   /**
    * Protobuf type {@code spinbattle.core.SpinGameState}
    */
-  public  static final class SpinGameState extends
+  public static final class SpinGameState extends
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:spinbattle.core.SpinGameState)
       SpinGameStateOrBuilder {
@@ -2846,6 +3020,7 @@ public final class SpinGameStateProtos {
      * <code>int32 playerFirst = 15;</code>
      * @return The playerFirst.
      */
+    @java.lang.Override
     public int getPlayerFirst() {
       return playerFirst_;
     }
@@ -2856,6 +3031,7 @@ public final class SpinGameStateProtos {
      * <code>int32 totalTicks = 1;</code>
      * @return The totalTicks.
      */
+    @java.lang.Override
     public int getTotalTicks() {
       return totalTicks_;
     }
@@ -2866,6 +3042,7 @@ public final class SpinGameStateProtos {
      * <code>int32 totalInstances = 2;</code>
      * @return The totalInstances.
      */
+    @java.lang.Override
     public int getTotalInstances() {
       return totalInstances_;
     }
@@ -2876,6 +3053,7 @@ public final class SpinGameStateProtos {
      * <code>int32 nTicks = 3;</code>
      * @return The nTicks.
      */
+    @java.lang.Override
     public int getNTicks() {
       return nTicks_;
     }
@@ -2886,6 +3064,7 @@ public final class SpinGameStateProtos {
      * <code>double currentScore = 4;</code>
      * @return The currentScore.
      */
+    @java.lang.Override
     public double getCurrentScore() {
       return currentScore_;
     }
@@ -2895,12 +3074,14 @@ public final class SpinGameStateProtos {
     /**
      * <code>repeated .spinbattle.core.Planet planets = 5;</code>
      */
+    @java.lang.Override
     public java.util.List<spinbattle.core.SpinGameStateProtos.Planet> getPlanetsList() {
       return planets_;
     }
     /**
      * <code>repeated .spinbattle.core.Planet planets = 5;</code>
      */
+    @java.lang.Override
     public java.util.List<? extends spinbattle.core.SpinGameStateProtos.PlanetOrBuilder> 
         getPlanetsOrBuilderList() {
       return planets_;
@@ -2908,18 +3089,21 @@ public final class SpinGameStateProtos {
     /**
      * <code>repeated .spinbattle.core.Planet planets = 5;</code>
      */
+    @java.lang.Override
     public int getPlanetsCount() {
       return planets_.size();
     }
     /**
      * <code>repeated .spinbattle.core.Planet planets = 5;</code>
      */
+    @java.lang.Override
     public spinbattle.core.SpinGameStateProtos.Planet getPlanets(int index) {
       return planets_.get(index);
     }
     /**
      * <code>repeated .spinbattle.core.Planet planets = 5;</code>
      */
+    @java.lang.Override
     public spinbattle.core.SpinGameStateProtos.PlanetOrBuilder getPlanetsOrBuilder(
         int index) {
       return planets_.get(index);
@@ -2931,6 +3115,7 @@ public final class SpinGameStateProtos {
      * <code>.spinbattle.core.Params params = 6;</code>
      * @return Whether the params field is set.
      */
+    @java.lang.Override
     public boolean hasParams() {
       return params_ != null;
     }
@@ -2938,12 +3123,14 @@ public final class SpinGameStateProtos {
      * <code>.spinbattle.core.Params params = 6;</code>
      * @return The params.
      */
+    @java.lang.Override
     public spinbattle.core.SpinGameStateProtos.Params getParams() {
       return params_ == null ? spinbattle.core.SpinGameStateProtos.Params.getDefaultInstance() : params_;
     }
     /**
      * <code>.spinbattle.core.Params params = 6;</code>
      */
+    @java.lang.Override
     public spinbattle.core.SpinGameStateProtos.ParamsOrBuilder getParamsOrBuilder() {
       return getParams();
     }
@@ -3412,6 +3599,7 @@ public final class SpinGameStateProtos {
        * <code>int32 playerFirst = 15;</code>
        * @return The playerFirst.
        */
+      @java.lang.Override
       public int getPlayerFirst() {
         return playerFirst_;
       }
@@ -3442,6 +3630,7 @@ public final class SpinGameStateProtos {
        * <code>int32 totalTicks = 1;</code>
        * @return The totalTicks.
        */
+      @java.lang.Override
       public int getTotalTicks() {
         return totalTicks_;
       }
@@ -3472,6 +3661,7 @@ public final class SpinGameStateProtos {
        * <code>int32 totalInstances = 2;</code>
        * @return The totalInstances.
        */
+      @java.lang.Override
       public int getTotalInstances() {
         return totalInstances_;
       }
@@ -3502,6 +3692,7 @@ public final class SpinGameStateProtos {
        * <code>int32 nTicks = 3;</code>
        * @return The nTicks.
        */
+      @java.lang.Override
       public int getNTicks() {
         return nTicks_;
       }
@@ -3532,6 +3723,7 @@ public final class SpinGameStateProtos {
        * <code>double currentScore = 4;</code>
        * @return The currentScore.
        */
+      @java.lang.Override
       public double getCurrentScore() {
         return currentScore_;
       }
@@ -4007,14 +4199,14 @@ public final class SpinGameStateProtos {
       "\030\002 \001(\001\022\r\n\005index\030\005 \001(\005\022\022\n\ngrowthRate\030\006 \001(" +
       "\001\022\021\n\tshipCount\030\007 \001(\001\022\017\n\007ownedBy\030\010 \001(\005\022-\n" +
       "\007transit\030\t \001(\0132\034.spinbattle.core.Transpo" +
-      "rter\"\032\n\006Params\022\020\n\010maxTicks\030\003 \001(\005\"\311\001\n\rSpi" +
-      "nGameState\022\023\n\013playerFirst\030\017 \001(\005\022\022\n\ntotal" +
-      "Ticks\030\001 \001(\005\022\026\n\016totalInstances\030\002 \001(\005\022\016\n\006n" +
-      "Ticks\030\003 \001(\005\022\024\n\014currentScore\030\004 \001(\001\022(\n\007pla" +
-      "nets\030\005 \003(\0132\027.spinbattle.core.Planet\022\'\n\006p" +
-      "arams\030\006 \001(\0132\027.spinbattle.core.ParamsB&\n\017" +
-      "spinbattle.coreB\023SpinGameStateProtosb\006pr" +
-      "oto3"
+      "rter\";\n\006Params\022\020\n\010maxTicks\030\003 \001(\005\022\016\n\005widt" +
+      "h\030\240\006 \001(\005\022\017\n\006height\030\330\004 \001(\005\"\311\001\n\rSpinGameSt" +
+      "ate\022\023\n\013playerFirst\030\017 \001(\005\022\022\n\ntotalTicks\030\001" +
+      " \001(\005\022\026\n\016totalInstances\030\002 \001(\005\022\016\n\006nTicks\030\003" +
+      " \001(\005\022\024\n\014currentScore\030\004 \001(\001\022(\n\007planets\030\005 " +
+      "\003(\0132\027.spinbattle.core.Planet\022\'\n\006params\030\006" +
+      " \001(\0132\027.spinbattle.core.ParamsB&\n\017spinbat" +
+      "tle.coreB\023SpinGameStateProtosb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -4038,7 +4230,7 @@ public final class SpinGameStateProtos {
     internal_static_spinbattle_core_Params_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_spinbattle_core_Params_descriptor,
-        new java.lang.String[] { "MaxTicks", });
+        new java.lang.String[] { "MaxTicks", "Width", "Height", });
     internal_static_spinbattle_core_SpinGameState_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_spinbattle_core_SpinGameState_fieldAccessorTable = new

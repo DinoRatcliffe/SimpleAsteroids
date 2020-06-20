@@ -272,7 +272,7 @@ public class SpinBattleServerProto extends Thread {
             int currentOpponent = 1;
             int currentPlanets = 6;
             int maxPlanets = 12;
-            SimplePlayerInterface opponent = evoAgent;
+            SimplePlayerInterface opponent = randomPlayer;
             Random random = new Random();
             int playerFirst = random.nextInt(2);
 
@@ -299,20 +299,20 @@ public class SpinBattleServerProto extends Thread {
                             currentGameState = restartStaticGame(globalRandom, currentPlanets);
                             currentPlanetIdicies = currentGameState.planetIndicies;
                             currentParams = currentGameState.params;
-                            playerFirst = random.nextInt(2);
-                            currentGameState.playerFirst = playerFirst;
+                            //playerFirst = random.nextInt(2);
+                            //currentGameState.playerFirst = playerFirst;
                             sendGameState(out, currentGameState, observationFunction);
                             break;
                     case 4: this.evalServer = true;
                             currentGameState = restartStaticGame(globalRandom, currentPlanets);
-                            playerFirst = random.nextInt(2);
-                            currentGameState.playerFirst = playerFirst;
+                            //playerFirst = random.nextInt(2);
+                            //currentGameState.playerFirst = playerFirst;
                             sendGameState(out, currentGameState, observationFunction);
                             break;
                     case 5: this.evalServer = false;
                             currentGameState = restartStaticGame(globalRandom, currentPlanets);
-                            playerFirst = random.nextInt(2);
-                            currentGameState.playerFirst = playerFirst;
+                            //playerFirst = random.nextInt(2);
+                            //currentGameState.playerFirst = playerFirst;
                             currentParams = currentGameState.params;
                             currentPlanetIdicies = currentGameState.planetIndicies;
                             currentPlayerIndicies = currentGameState.playerIndicies;
@@ -320,8 +320,8 @@ public class SpinBattleServerProto extends Thread {
                             break;
                     case 0: currentGameState = restartStaticGame(globalRandom, currentPlanets);
                             opponent.reset();
-                            playerFirst = random.nextInt(2);
-                            currentGameState.playerFirst = playerFirst;
+                            //playerFirst = random.nextInt(2);
+                            //currentGameState.playerFirst = playerFirst;
                             sendGameState(out, currentGameState, observationFunction);
                             break;
                     case 1: currentGameState = loadGameState(dis);
@@ -336,9 +336,10 @@ public class SpinBattleServerProto extends Thread {
                     case 8: if (currentPlanets < maxPlanets) {
                                 currentPlanets += 2;
                             }
+                            System.out.println("curriculum increase");
                             currentGameState = restartStaticGame(globalRandom, currentPlanets);
-                            playerFirst = random.nextInt(2);
-                            currentGameState.playerFirst = playerFirst;
+                            //playerFirst = random.nextInt(2);
+                            //currentGameState.playerFirst = playerFirst;
                             System.out.println(currentGameState.planets.size());
                             sendGameState(out, currentGameState, observationFunction);
                             break;
@@ -388,6 +389,7 @@ public class SpinBattleServerProto extends Thread {
         } else {
             SpinBattleParams.random = globalRandom;
         }
+        SpinBattleParams.random = new Random(eval_seeds[0]);
 
         SpinBattleParams params = new SpinBattleParams();
         params.width = (int) (params.width*1.5);

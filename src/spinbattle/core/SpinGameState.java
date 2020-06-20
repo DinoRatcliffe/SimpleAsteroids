@@ -434,6 +434,8 @@ public class SpinGameState implements AbstractGameState {
     public static byte[] toByteArray(SpinGameState state) {
         SpinGameStateProtos.Params.Builder paramsBuilder = SpinGameStateProtos.Params.newBuilder();
         paramsBuilder.setMaxTicks(state.params.maxTicks);
+        paramsBuilder.setWidth(state.params.width);
+        paramsBuilder.setHeight(state.params.height);
 
         SpinGameStateProtos.SpinGameState.Builder gsBuilder = SpinGameStateProtos.SpinGameState.newBuilder();
         gsBuilder.setPlayerFirst(state.playerFirst)
