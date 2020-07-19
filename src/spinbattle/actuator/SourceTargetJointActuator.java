@@ -43,6 +43,8 @@ public class SourceTargetJointActuator implements Actuator {
             return gameState;
         }
 
+        if (action == 255) return null;
+
         // matches how python itertools.permutations creates pairs
         int step = gameState.planets.size() - 1;
         int srcPlanet = action / step;

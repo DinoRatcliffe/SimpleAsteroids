@@ -222,17 +222,27 @@ public class SpinBattleServerProto extends Thread {
         return observationFunction;
     }
 
-    private SpinGameState transition(SpinGameState state, int action, SimplePlayerInterface opponent) {
+    private SpinGameState transition_multiagent(SpinGameState state, int action, int opponent_action) {
         int[] actions = new int[2];
         if (state.playerFirst == 0) {
             actions[0] = action;
-            actions[1] = opponent.getAction(state, 1);
+            actions[1] = opponent_action;
         } else {
             actions[1] = action;
-            actions[0] = opponent.getAction(state, 0);
+            actions[0] = opponent_action;
         }
         SpinGameState new_state = (SpinGameState) state.next(actions);
         return new_state;
+    }
+
+    private SpinGameState transition(SpinGameState state, int action, SimplePlayerInterface opponent) {
+        int opponent_action;
+        if (state.playerFirst == 0) {
+            opponent_action = opponent.getAction(state, 1);
+        } else {
+            opponent_action = opponent.getAction(state, 0);
+        }
+        return transition_multiagent(state, action, opponent_action);
     }
 
     public void run() {
@@ -272,7 +282,7 @@ public class SpinBattleServerProto extends Thread {
             int currentOpponent = 1;
             int currentPlanets = 6;
             int maxPlanets = 12;
-            SimplePlayerInterface opponent = randomPlayer;
+            SimplePlayerInterface opponent = evoAgent; //randomPlayer;
             Random random = new Random();
             int playerFirst = random.nextInt(2);
 
@@ -287,6 +297,8 @@ public class SpinBattleServerProto extends Thread {
             int batchSize;
 
             int action = 0;
+            int opponent_action = 0;
+
             boolean requestClose = false;
 
             double prevTime;
@@ -299,20 +311,20 @@ public class SpinBattleServerProto extends Thread {
                             currentGameState = restartStaticGame(globalRandom, currentPlanets);
                             currentPlanetIdicies = currentGameState.planetIndicies;
                             currentParams = currentGameState.params;
-                            //playerFirst = random.nextInt(2);
-                            //currentGameState.playerFirst = playerFirst;
+                            playerFirst = random.nextInt(2);
+                            currentGameState.playerFirst = playerFirst;
                             sendGameState(out, currentGameState, observationFunction);
                             break;
                     case 4: this.evalServer = true;
                             currentGameState = restartStaticGame(globalRandom, currentPlanets);
-                            //playerFirst = random.nextInt(2);
-                            //currentGameState.playerFirst = playerFirst;
+                            playerFirst = random.nextInt(2);
+                            currentGameState.playerFirst = playerFirst;
                             sendGameState(out, currentGameState, observationFunction);
                             break;
                     case 5: this.evalServer = false;
                             currentGameState = restartStaticGame(globalRandom, currentPlanets);
-                            //playerFirst = random.nextInt(2);
-                            //currentGameState.playerFirst = playerFirst;
+                            playerFirst = random.nextInt(2);
+                            currentGameState.playerFirst = playerFirst;
                             currentParams = currentGameState.params;
                             currentPlanetIdicies = currentGameState.planetIndicies;
                             currentPlayerIndicies = currentGameState.playerIndicies;
@@ -320,8 +332,8 @@ public class SpinBattleServerProto extends Thread {
                             break;
                     case 0: currentGameState = restartStaticGame(globalRandom, currentPlanets);
                             opponent.reset();
-                            //playerFirst = random.nextInt(2);
-                            //currentGameState.playerFirst = playerFirst;
+                            playerFirst = random.nextInt(2);
+                            currentGameState.playerFirst = playerFirst;
                             sendGameState(out, currentGameState, observationFunction);
                             break;
                     case 1: currentGameState = loadGameState(dis);
@@ -330,7 +342,21 @@ public class SpinBattleServerProto extends Thread {
                             currentGameState.playerIndicies = currentPlayerIndicies;
                             currentGameState.setParams(currentParams);
                             action = Byte.toUnsignedInt(dis.readByte());
+
                             currentGameState = transition(currentGameState, action, opponent);
+
+                            sendGameState(out, currentGameState, observationFunction);
+                            break;
+                    case 7: currentGameState = loadGameState(dis);
+                            currentGameState.actuators = currentActuators;
+                            currentGameState.planetIndicies = currentPlanetIdicies;
+                            currentGameState.playerIndicies = currentPlayerIndicies;
+                            currentGameState.setParams(currentParams);
+                            action = Byte.toUnsignedInt(dis.readByte());
+                            opponent_action = Byte.toUnsignedInt(dis.readByte());
+
+                            currentGameState = transition_multiagent(currentGameState, action, opponent_action);
+
                             sendGameState(out, currentGameState, observationFunction);
                             break;
                     case 8: if (currentPlanets < maxPlanets) {
@@ -338,8 +364,8 @@ public class SpinBattleServerProto extends Thread {
                             }
                             System.out.println("curriculum increase");
                             currentGameState = restartStaticGame(globalRandom, currentPlanets);
-                            //playerFirst = random.nextInt(2);
-                            //currentGameState.playerFirst = playerFirst;
+                            playerFirst = random.nextInt(2);
+                            currentGameState.playerFirst = playerFirst;
                             System.out.println(currentGameState.planets.size());
                             sendGameState(out, currentGameState, observationFunction);
                             break;
