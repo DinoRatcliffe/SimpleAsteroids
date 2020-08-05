@@ -282,7 +282,7 @@ public class SpinBattleServerProto extends Thread {
             int currentOpponent = 1;
             int currentPlanets = 6;
             int maxPlanets = 12;
-            SimplePlayerInterface opponent = evoAgent; //randomPlayer;
+            SimplePlayerInterface opponent = evoAgent;
             Random random = new Random();
             int playerFirst = random.nextInt(2);
 
@@ -481,7 +481,7 @@ public class SpinBattleServerProto extends Thread {
     public static void main(String[] args) throws Exception {
         ServerSocket serverSocket = new ServerSocket();
         //serverSocket.setReceiveBufferSize(4096);
-        serverSocket.bind(new InetSocketAddress(InetAddress.getByName("127.0.0.1"), defaultPort));
+        serverSocket.bind(new InetSocketAddress(InetAddress.getByName("0.0.0.0"), defaultPort));
         //serverSocket.setPerformancePreferences(0, 2, 1);
         int i = 0;
         while (true) {

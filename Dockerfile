@@ -18,4 +18,4 @@ WORKDIR /root/SimpleAsteroids
 
 RUN ./gradlew build
 
-CMD java -cp build/libs/SimpleAsteroids.jar spinbattle.network.SpinBattleServer
+CMD java -cp build/libs/SimpleAsteroids.jar spinbattle.network.SpinBattleServerProto
