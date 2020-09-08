@@ -278,7 +278,8 @@ public class SpinBattleServerProto extends Thread {
                 pea.setNEvals(i);
                 curriculumOpponnets.add(pea);
             }
-            SimplePlayerInterface evoAgent = evoPolicyAgent;
+//            SimplePlayerInterface evoAgent = evoPolicyAgent;
+            SimplePlayerInterface evoAgent = getEvoAgent();
             int currentOpponent = 1;
             int currentPlanets = 6;
             int maxPlanets = 12;
@@ -462,7 +463,7 @@ public class SpinBattleServerProto extends Thread {
         int nEvals = 20;
         int seqLength = 100;
         EvoAgent evoAgent = new EvoAgent().setEvoAlg(evoAlg, nEvals).setSequenceLength(seqLength);
-        boolean useShiftBuffer = false;
+        boolean useShiftBuffer = true;
         evoAgent.setUseShiftBuffer(useShiftBuffer);
         //evoAgent.setVisual();
 

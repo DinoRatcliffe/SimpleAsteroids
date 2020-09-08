@@ -19,7 +19,7 @@ public class IterANNPlayer implements SimplePlayerInterface {
     private double[] inputState;
     private boolean initInput = false;
     private DoubleBuffer doubleBuffer;
-    double[][] out_policy;
+    float[][] out_policy;
 
     private long[] shape;
 
@@ -37,7 +37,7 @@ public class IterANNPlayer implements SimplePlayerInterface {
             shape[1] = inputState.length;
             initInput = true;
             doubleBuffer = DoubleBuffer.allocate(inputState.length);
-            out_policy = new double[1][numActions * numActions - numActions];
+            out_policy = new float[1][numActions * numActions - numActions];
         }
 
         doubleBuffer.clear();
